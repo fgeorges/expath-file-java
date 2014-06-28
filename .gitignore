@@ -1,3 +1,5 @@
+/build/file-saxon-*.xar
+/build/file-saxon-*/
 /file-java/nbproject/private/
 /file-java/dist/
 /file-java/build/
