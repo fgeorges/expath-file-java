@@ -1,0 +1,13 @@
+<package xmlns="http://expath.org/ns/pkg"
+         name="http://expath.org/lib/files"
+         abbrev="file-saxon"
+         version="0.5.0pre1"
+         spec="1.0">
+
+   <title>EXPath File System module for Saxon</title>
+
+   <home>http://expath.org/modules/file/</home>
+
+   <dependency processor="http://saxon.sf.net/he"/>
+
+</package>
