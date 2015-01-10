@@ -10,6 +10,7 @@
 
 package org.expath.file;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
@@ -20,44 +21,70 @@ import java.nio.file.attribute.FileTime;
 import java.util.Date;
 
 /**
- * Facade for EXPath File module function in section "File Properties".
+ * Facade for EXPath File module function in sections "File Properties" and "System Properties".
  * 
  * @author Florent Georges
  * @date   2015-01-07
  * @see http://expath.org/spec/file#props
+ * @see http://expath.org/spec/file#sys-props
  * @see http://expath.org/spec/file/20131203#props
+ * @see http://expath.org/spec/file/20131203#sys-props
  */
 public class Properties
 {
+    // file:dir-separator() as xs:string
+    public static String dirSeparator()
+    {
+        return File.separator;
+    }
+
+    // file:line-separator() as xs:string
+    public static String lineSeparator()
+    {
+        return System.lineSeparator();
+    }
+
+    // file:path-separator() as xs:string
+    public static String pathSeparator()
+    {
+        return File.pathSeparator;
+    }
+
+    // file:temp-dir() as xs:string
+    public static String tempDir()
+    {
+        return TEMP_DIR;
+    }
+
     // file:exists($path as xs:string) as xs:boolean
-    public boolean exists(String path)
+    public static boolean exists(String path)
     {
         return exists(getPath(path));
     }
 
-    public boolean exists(Path path)
+    public static boolean exists(Path path)
     {
         return Files.exists(path);
     }
 
     // file:is-dir($path as xs:string) as xs:boolean
-    public boolean isDir(String path)
+    public static boolean isDir(String path)
     {
         return isDir(getPath(path));
     }
 
-    public boolean isDir(Path path)
+    public static boolean isDir(Path path)
     {
         return Files.isDirectory(path);
     }
 
     // file:is-file($path as xs:string) as xs:boolean
-    public boolean isFile(String path)
+    public static boolean isFile(String path)
     {
         return isFile(getPath(path));
     }
 
-    public boolean isFile(Path path)
+    public static boolean isFile(Path path)
     {
         return Files.isRegularFile(path);
     }
@@ -65,13 +92,13 @@ public class Properties
     // file:last-modified($path as xs:string) as xs:dateTime
     // [file:not-found] is raised if $path does not exist.
     // [file:io-error] is raised if any other error occurs.
-    public Date lastModified(String path)
+    public static Date lastModified(String path)
             throws FileException
     {
         return lastModified(getPath(path));
     }
 
-    public Date lastModified(Path path)
+    public static Date lastModified(Path path)
             throws FileException
     {
         try {
@@ -90,13 +117,13 @@ public class Properties
     // file:size($file as xs:string) as xs:integer
     // [file:not-found] is raised if $path does not exist.
     // [file:io-error] is raised if any other error occurs.
-    public long size(String path)
+    public static long size(String path)
             throws FileException
     {
         return size(getPath(path));
     }
 
-    public long size(Path path)
+    public static long size(Path path)
             throws FileException
     {
         try {
@@ -116,11 +143,13 @@ public class Properties
      * @param path
      * @return 
      */
-    public Path getPath(String path)
+    public static Path getPath(String path)
     {
         FileSystem fs = FileSystems.getDefault();
         return fs.getPath(path);
     }
+
+    private static final String TEMP_DIR = System.getProperty("java.io.tmpdir");
 }
 
 
