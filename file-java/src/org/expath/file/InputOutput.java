@@ -70,12 +70,16 @@ public class InputOutput
     {
         ensureNotNull(file, "file cannot be null");
         ensureNotNull(items, "items cannot be null");
+        OutputStream out = null;
         try {
-            OutputStream out = openOutputStream(file, true);
+            out = openOutputStream(file, true);
             items.serialize(out, params);
         }
         catch ( ToolsException ex ) {
             throw FileException.ioError("Error serializing to the file: " + file, ex);
+        }
+        finally {
+            close(out);
         }
     }
 
@@ -89,12 +93,16 @@ public class InputOutput
     {
         ensureNotNull(file, "file cannot be null");
         ensureNotNull(value, "value cannot be null");
+        OutputStream out = null;
         try {
-            OutputStream out = openOutputStream(file, true);
+            out = openOutputStream(file, true);
             out.write(value);
         }
         catch ( IOException ex ) {
             throw FileException.ioError("Error writing binary to the file: " + file, ex);
+        }
+        finally {
+            close(out);
         }
     }
 
@@ -112,12 +120,16 @@ public class InputOutput
     {
         ensureNotNull(file, "file cannot be null");
         ensureNotNull(value, "value cannot be null");
+        Writer out = null;
         try {
-            Writer out = openWriter(file, true);
+            out = openWriter(file, true);
             out.write(value);
         }
         catch ( IOException ex ) {
             throw FileException.ioError("Error writing text to the file: " + file, ex);
+        }
+        finally {
+            close(out);
         }
     }
 
@@ -127,8 +139,9 @@ public class InputOutput
         ensureNotNull(file, "file cannot be null");
         ensureNotNull(value, "value cannot be null");
         ensureNotNull(encoding, "encoding cannot be null");
+        OutputStream out = null;
         try {
-            OutputStream out = openOutputStream(file, true);
+            out = openOutputStream(file, true);
             byte[] bytes = value.getBytes(encoding);
             out.write(bytes);
         }
@@ -137,6 +150,9 @@ public class InputOutput
         }
         catch ( IOException ex ) {
             throw FileException.ioError("Error writing text to the file: " + file, ex);
+        }
+        finally {
+            close(out);
         }
     }
 
@@ -155,8 +171,9 @@ public class InputOutput
         ensureNotNull(file, "file cannot be null");
         ensureNotNull(values, "values cannot be null");
         final String nl = Properties.lineSeparator();
+        Writer out = null;
         try {
-            Writer out = openWriter(file, true);
+            out = openWriter(file, true);
             for ( String line : values ) {
                 out.write(line);
                 out.write(nl);
@@ -164,6 +181,9 @@ public class InputOutput
         }
         catch ( IOException ex ) {
             throw FileException.ioError("Error writing text to the file: " + file, ex);
+        }
+        finally {
+            close(out);
         }
     }
 
@@ -361,6 +381,32 @@ public class InputOutput
     {
         if ( null == obj ) {
             throw new NullPointerException(msg);
+        }
+    }
+
+    private void close(OutputStream out)
+            throws FileException
+    {
+        if ( out != null ) {
+            try {
+                out.close();
+            }
+            catch ( IOException ex ) {
+                throw FileException.ioError("Error closing the output stream", ex);
+            }
+        }
+    }
+
+    private void close(Writer out)
+            throws FileException
+    {
+        if ( out != null ) {
+            try {
+                out.close();
+            }
+            catch ( IOException ex ) {
+                throw FileException.ioError("Error closing the writer", ex);
+            }
         }
     }
 
