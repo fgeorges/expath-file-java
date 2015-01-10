@@ -37,7 +37,7 @@ import org.testng.annotations.Test;
 public class AppendTest
 {
     @Test
-    public void simpleStringAppend()
+    public void appendSequence_simpleString()
             throws Exception
     {
         String xml = "<root>Second line.&#10;</root>";
@@ -50,17 +50,9 @@ public class AppendTest
         assertEquals(result, "First line.\nSecond line.\n", "The content of the file after append");
     }
 
-    @BeforeClass
-    public static void setUpClass()
-            throws Exception
-    {
-        validateDir(PWD);
-        validateDir(RSRC);
-        validateDir(INITIAL);
-        validateDir(STAGE);
-        deleteDir(STAGE);
-        copyDir(INITIAL, STAGE);
-    }
+    // ----------------------------------------------------------------------
+    //   Utility functions
+    // ----------------------------------------------------------------------
 
     private String readTextFile(File f)
             throws IOException
@@ -76,6 +68,32 @@ public class AppendTest
             return buf.toString();
         }
     }
+
+    @AfterClass
+    public static void tearDownClass()
+            throws Exception
+    {
+    }
+
+    // ----------------------------------------------------------------------
+    //   Test setup
+    // ----------------------------------------------------------------------
+
+    @BeforeClass
+    public static void setUpClass()
+            throws Exception
+    {
+        validateDir(PWD);
+        validateDir(RSRC);
+        validateDir(INITIAL);
+        validateDir(STAGE);
+        deleteDir(STAGE);
+        copyDir(INITIAL, STAGE);
+    }
+
+    // ----------------------------------------------------------------------
+    //   Setup utility functions
+    // ----------------------------------------------------------------------
 
     private static void validateDir(File d)
     {
@@ -137,12 +155,6 @@ public class AppendTest
                 }
             }
         }
-    }
-
-    @AfterClass
-    public static void tearDownClass()
-            throws Exception
-    {
     }
 
     private static final String PWD_PROP   = System.getProperty("user.dir");
