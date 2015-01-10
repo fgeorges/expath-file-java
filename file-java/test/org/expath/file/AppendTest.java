@@ -18,6 +18,10 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 import org.expath.tools.model.Element;
 import org.expath.tools.model.Sequence;
 import org.expath.tools.model.dom.DomElement;
@@ -36,6 +40,7 @@ import org.testng.annotations.Test;
  */
 public class AppendTest
 {
+    // TODO: Add more tests with more complex sequences.
     @Test
     public void appendSequence_simpleString()
             throws Exception
@@ -43,11 +48,54 @@ public class AppendTest
         String xml = "<root>Second line.&#10;</root>";
         Element elem = DomElement.parseString(xml);
         Sequence seq = elem.getContent();
-        String file = APPEND_FIRST.getAbsolutePath();
+        String file = APPEND_01.getAbsolutePath();
         InputOutput sut = new InputOutput();
         sut.append(file, seq);
-        String result = readTextFile(APPEND_FIRST);
-        assertEquals(result, "First line.\nSecond line.\n", "The content of the file after append");
+        String result = readTextFile(APPEND_01);
+        assertEquals(result, "First line.\nSecond line.\n",
+                "The content of the text file after append");
+    }
+
+    @Test
+    public void appendBinary_simpleBinary()
+            throws Exception
+    {
+        byte[] bytes = { 0b100, 0b101, 0b110, 0b111 };
+        String file = APPEND_02.getAbsolutePath();
+        InputOutput sut = new InputOutput();
+        sut.appendBinary(file, bytes);
+        byte[] result = readBinFile(APPEND_02);
+        byte[] expect = { 0b0, 0b1, 0b10, 0b11, 0b100, 0b101, 0b110, 0b111 };
+        assertEquals(result, expect, "The content of the binary file after append");
+    }
+
+    // TODO: Add tests with encoding.
+    @Test
+    public void appendText_simpleString()
+            throws Exception
+    {
+        String str = "Second line.\n";
+        String file = APPEND_03.getAbsolutePath();
+        InputOutput sut = new InputOutput();
+        sut.appendText(file, str);
+        String result = readTextFile(APPEND_03);
+        assertEquals(result, "First line.\nSecond line.\n",
+                "The content of the text file after text append");
+    }
+
+    @Test
+    public void appendTextLines_simpleStrings()
+            throws Exception
+    {
+        List<String> lines = new ArrayList<>();
+        lines.add("Second line.");
+        lines.add("Third line.");
+        String file = APPEND_04.getAbsolutePath();
+        InputOutput sut = new InputOutput();
+        sut.appendTextLines(file, lines);
+        String result = readTextFile(APPEND_04);
+        assertEquals(result, "First line.\nSecond line.\nThird line.\n",
+                "The content of the text file after text append");
     }
 
     // ----------------------------------------------------------------------
@@ -69,6 +117,13 @@ public class AppendTest
         }
     }
 
+    private byte[] readBinFile(File f)
+            throws IOException
+    {
+        Path p = f.toPath();
+        return Files.readAllBytes(p);
+    }
+
     @AfterClass
     public static void tearDownClass()
             throws Exception
@@ -83,12 +138,17 @@ public class AppendTest
     public static void setUpClass()
             throws Exception
     {
+        // validate dirs exist
         validateDir(PWD);
         validateDir(RSRC);
         validateDir(INITIAL);
         validateDir(STAGE);
+        // delete test-src/stage/
         deleteDir(STAGE);
+        // copy test-rsrc/initial/ to test-src/stage/ again
         copyDir(INITIAL, STAGE);
+        // create "append #2"
+        writeBin(APPEND_02, 0b0, 0b1, 0b10, 0b11);
     }
 
     // ----------------------------------------------------------------------
@@ -157,13 +217,25 @@ public class AppendTest
         }
     }
 
-    private static final String PWD_PROP   = System.getProperty("user.dir");
-    private static final File PWD          = new File(PWD_PROP);
-    private static final File RSRC         = new File(PWD, "test-rsrc");
-    private static final File INITIAL      = new File(RSRC, "initial");
-    private static final File STAGE        = new File(RSRC, "stage");
-    private static final File APPEND       = new File(STAGE, "append");
-    private static final File APPEND_FIRST = new File(APPEND, "first.txt");
+    private static void writeBin(File f, int... bytes)
+            throws IOException
+    {
+        OutputStream out = new FileOutputStream(f);
+        for ( int b : bytes ) {
+            out.write(b);
+        }
+    }
+
+    private static final String PWD_PROP  = System.getProperty("user.dir");
+    private static final File   PWD       = new File(PWD_PROP);
+    private static final File   RSRC      = new File(PWD, "test-rsrc");
+    private static final File   INITIAL   = new File(RSRC, "initial");
+    private static final File   STAGE     = new File(RSRC, "stage");
+    private static final File   APPEND    = new File(STAGE, "append");
+    private static final File   APPEND_01 = new File(APPEND, "first.txt");
+    private static final File   APPEND_02 = new File(APPEND, "second.bin");
+    private static final File   APPEND_03 = new File(APPEND, "third.txt");
+    private static final File   APPEND_04 = new File(APPEND, "fourth.txt");
 }
 
 
