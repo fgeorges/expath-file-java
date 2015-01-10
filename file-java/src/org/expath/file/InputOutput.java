@@ -13,7 +13,12 @@ package org.expath.file;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
+import java.io.Writer;
+import java.util.List;
 import org.expath.tools.model.Sequence;
 import org.expath.tools.ToolsException;
 import org.expath.tools.model.Element;
@@ -29,6 +34,10 @@ import org.expath.tools.serial.SerialParameters;
  */
 public class InputOutput
 {
+    // ----------------------------------------------------------------------
+    //   Append
+    // ----------------------------------------------------------------------
+
     // file:append($file as xs:string,
     //             $items as item()*) as empty-sequence()
     // file:append($file as xs:string,
@@ -59,21 +68,10 @@ public class InputOutput
     public void append(String file, Sequence items, SerialParameters params)
             throws FileException
     {
-        File f = new File(file);
-        OutputStream out;
+        ensureNotNull(file, "file cannot be null");
+        ensureNotNull(items, "items cannot be null");
         try {
-            out = new FileOutputStream(f, true);
-        }
-        catch ( FileNotFoundException ex ) {
-            if ( f.isDirectory() ) {
-                throw FileException.isDir("The file already exists and is a directory: " + file, ex);
-            }
-            if ( ! f.exists() && ! f.getParentFile().isDirectory() ) {
-                throw FileException.isDir("The file must be created and its directory does not exist: " + file, ex);
-            }
-            throw FileException.ioError("Error creating or opening the file: " + file, ex);
-        }
-        try {
+            OutputStream out = openOutputStream(file, true);
             items.serialize(out, params);
         }
         catch ( ToolsException ex ) {
@@ -81,44 +79,98 @@ public class InputOutput
         }
     }
 
-//    // file:append-binary($file as xs:string,
-//    //                    $value as xs:base64Binary) as empty-sequence()
-//    // [file:no-dir] is raised if the parent directory of $file does not exist.
-//    // [file:is-dir] is raised if $file points to a directory.
-//    // [file:io-error] is raised if any other error occurs.
-//    public void appendBinary()
-//    {
-//        ...
-//    }
-//
-//    // file:append-text($file as xs:string,
-//    //                  $value as xs:string) as empty-sequence()
-//    // file:append-text($file as xs:string,
-//    //                  $value as xs:string,
-//    //                  $encoding as xs:string) as empty-sequence()
-//    // [file:no-dir] is raised if the parent directory of $file does not exist.
-//    // [file:is-dir] is raised if $file points to a directory.
-//    // [file:unknown-encoding] is raised if $encoding is invalid or not supported by the implementation.
-//    // [file:io-error] is raised if any other error occurs.
-//    public void appendText()
-//    {
-//        ...
-//    }
-//
-//    // file:append-text-lines($file as xs:string,
-//    //                        $values as xs:string*) as empty-sequence()
-//    // file:append-text-lines($file as xs:string,
-//    //                        $lines as xs:string*,
-//    //                        $encoding as xs:string) as empty-sequence()
-//    // [file:no-dir] is raised if the parent directory of $file does not exist.
-//    // [file:is-dir] is raised if $file points to a directory.
-//    // [file:unknown-encoding] is raised if $encoding is invalid or not supported by the implementation.
-//    // [file:io-error] is raised if any other error occurs.
-//    public void appendTextLines()
-//    {
-//        ...
-//    }
-//
+    // file:append-binary($file as xs:string,
+    //                    $value as xs:base64Binary) as empty-sequence()
+    // [file:no-dir] is raised if the parent directory of $file does not exist.
+    // [file:is-dir] is raised if $file points to a directory.
+    // [file:io-error] is raised if any other error occurs.
+    public void appendBinary(String file, byte[] value)
+            throws FileException
+    {
+        ensureNotNull(file, "file cannot be null");
+        ensureNotNull(value, "value cannot be null");
+        try {
+            OutputStream out = openOutputStream(file, true);
+            out.write(value);
+        }
+        catch ( IOException ex ) {
+            throw FileException.ioError("Error writing binary to the file: " + file, ex);
+        }
+    }
+
+    // file:append-text($file as xs:string,
+    //                  $value as xs:string) as empty-sequence()
+    // file:append-text($file as xs:string,
+    //                  $value as xs:string,
+    //                  $encoding as xs:string) as empty-sequence()
+    // [file:no-dir] is raised if the parent directory of $file does not exist.
+    // [file:is-dir] is raised if $file points to a directory.
+    // [file:unknown-encoding] is raised if $encoding is invalid or not supported by the implementation.
+    // [file:io-error] is raised if any other error occurs.
+    public void appendText(String file, String value)
+            throws FileException
+    {
+        ensureNotNull(file, "file cannot be null");
+        ensureNotNull(value, "value cannot be null");
+        try {
+            Writer out = openWriter(file, true);
+            out.write(value);
+        }
+        catch ( IOException ex ) {
+            throw FileException.ioError("Error writing text to the file: " + file, ex);
+        }
+    }
+
+    public void appendText(String file, String value, String encoding)
+            throws FileException
+    {
+        ensureNotNull(file, "file cannot be null");
+        ensureNotNull(value, "value cannot be null");
+        ensureNotNull(encoding, "encoding cannot be null");
+        try {
+            OutputStream out = openOutputStream(file, true);
+            byte[] bytes = value.getBytes(encoding);
+            out.write(bytes);
+        }
+        catch ( UnsupportedEncodingException ex ) {
+            throw FileException.unknownEncoding("Unsupported encoding: " + encoding, ex);
+        }
+        catch ( IOException ex ) {
+            throw FileException.ioError("Error writing text to the file: " + file, ex);
+        }
+    }
+
+    // file:append-text-lines($file as xs:string,
+    //                        $values as xs:string*) as empty-sequence()
+    // file:append-text-lines($file as xs:string,
+    //                        $lines as xs:string*,
+    //                        $encoding as xs:string) as empty-sequence()
+    // [file:no-dir] is raised if the parent directory of $file does not exist.
+    // [file:is-dir] is raised if $file points to a directory.
+    // [file:unknown-encoding] is raised if $encoding is invalid or not supported by the implementation.
+    // [file:io-error] is raised if any other error occurs.
+    public void appendTextLines(String file, List<String> values)
+            throws FileException
+    {
+        ensureNotNull(file, "file cannot be null");
+        ensureNotNull(values, "values cannot be null");
+        final String nl = Properties.lineSeparator();
+        try {
+            Writer out = openWriter(file, true);
+            for ( String line : values ) {
+                out.write(line);
+                out.write(nl);
+            }
+        }
+        catch ( IOException ex ) {
+            throw FileException.ioError("Error writing text to the file: " + file, ex);
+        }
+    }
+
+    // ----------------------------------------------------------------------
+    //   Misc
+    // ----------------------------------------------------------------------
+
 //    // file:copy($source as xs:string,
 //    //           $target as xs:string) as empty-sequence()
 //    // [file:not-found] is raised if the $source path does not exist.
@@ -198,7 +250,11 @@ public class InputOutput
 //    {
 //        ...
 //    }
-//
+
+    // ----------------------------------------------------------------------
+    //   Read
+    // ----------------------------------------------------------------------
+
 //    // file:read-binary($file as xs:string) as xs:base64Binary
 //    // file:read-binary($file as xs:string,
 //    //                  $offset as xs:integer) as xs:base64Binary
@@ -237,7 +293,11 @@ public class InputOutput
 //    {
 //        ...
 //    }
-//
+
+    // ----------------------------------------------------------------------
+    //   Write
+    // ----------------------------------------------------------------------
+
 //    // file:write($file as xs:string,
 //    //            $items as item()*) as empty-sequence()
 //    // file:write($file as xs:string,
@@ -292,6 +352,53 @@ public class InputOutput
 //    {
 //        ...
 //    }
+
+    // ----------------------------------------------------------------------
+    //   Utility functions
+    // ----------------------------------------------------------------------
+
+    private void ensureNotNull(Object obj, String msg)
+    {
+        if ( null == obj ) {
+            throw new NullPointerException(msg);
+        }
+    }
+
+    private Writer openWriter(String file, boolean append)
+            throws FileException
+    {
+        File f = new File(file);
+        try {
+            return new FileWriter(f, append);
+        }
+        catch ( IOException ex ) {
+            if ( f.isDirectory() ) {
+                throw FileException.isDir("The file already exists and is a directory: " + file, ex);
+            }
+            if ( ! f.exists() && ! f.getParentFile().isDirectory() ) {
+                throw FileException.isDir("The file must be created and its directory does not exist: " + file, ex);
+            }
+            throw FileException.ioError("Error creating or opening the file: " + file, ex);
+        }
+    }
+
+    private OutputStream openOutputStream(String file, boolean append)
+            throws FileException
+    {
+        File f = new File(file);
+        try {
+            return new FileOutputStream(f, append);
+        }
+        catch ( FileNotFoundException ex ) {
+            if ( f.isDirectory() ) {
+                throw FileException.isDir("The file already exists and is a directory: " + file, ex);
+            }
+            if ( ! f.exists() && ! f.getParentFile().isDirectory() ) {
+                throw FileException.isDir("The file must be created and its directory does not exist: " + file, ex);
+            }
+            throw FileException.ioError("Error creating or opening the file: " + file, ex);
+        }
+    }
 }
 
 
