@@ -20,6 +20,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import static org.testng.Assert.assertEquals;
 
 /**
  * Tools for tests of file-java features.
@@ -90,6 +91,20 @@ public class TestTools
     {
         Path p = f.toPath();
         return Files.readAllBytes(p);
+    }
+
+    public static void assertFileEquals(File file, String content, String msg)
+            throws IOException
+    {
+        String result = TestTools.readTextFile(file);
+        assertEquals(result, content, msg);
+    }
+
+    public static void assertFileEquals(File file, byte[] content, String msg)
+            throws IOException
+    {
+        byte[] result = TestTools.readBinFile(file);
+        assertEquals(result, content, msg);
     }
 
     // ----------------------------------------------------------------------

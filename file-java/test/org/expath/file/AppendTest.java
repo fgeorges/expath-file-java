@@ -13,10 +13,10 @@ package org.expath.file;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import static org.expath.file.TestTools.assertFileEquals;
 import org.expath.tools.model.Element;
 import org.expath.tools.model.Sequence;
 import org.expath.tools.model.dom.DomElement;
-import static org.testng.Assert.*;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -41,8 +41,7 @@ public class AppendTest
         String file = APPEND_01.getAbsolutePath();
         InputOutput sut = new InputOutput();
         sut.append(file, seq);
-        String result = TestTools.readTextFile(APPEND_01);
-        assertEquals(result, "First line.\nSecond line.\n",
+        assertFileEquals(APPEND_01, "First line.\nSecond line.\n",
                 "The content of the text file after append");
     }
 
@@ -54,9 +53,8 @@ public class AppendTest
         String file = APPEND_02.getAbsolutePath();
         InputOutput sut = new InputOutput();
         sut.appendBinary(file, bytes);
-        byte[] result = TestTools.readBinFile(APPEND_02);
         byte[] expect = { 0b0, 0b1, 0b10, 0b11, 0b100, 0b101, 0b110, 0b111 };
-        assertEquals(result, expect, "The content of the binary file after append");
+        assertFileEquals(APPEND_02, expect, "The content of the binary file after append");
     }
 
     // TODO: Add tests with encoding.
@@ -68,8 +66,7 @@ public class AppendTest
         String file = APPEND_03.getAbsolutePath();
         InputOutput sut = new InputOutput();
         sut.appendText(file, str);
-        String result = TestTools.readTextFile(APPEND_03);
-        assertEquals(result, "First line.\nSecond line.\n",
+        assertFileEquals(APPEND_03, "First line.\nSecond line.\n",
                 "The content of the text file after appending text");
     }
 
@@ -83,8 +80,7 @@ public class AppendTest
         String file = APPEND_04.getAbsolutePath();
         InputOutput sut = new InputOutput();
         sut.appendTextLines(file, lines);
-        String result = TestTools.readTextFile(APPEND_04);
-        assertEquals(result, "First line.\nSecond line.\nThird line.\n",
+        assertFileEquals(APPEND_04, "First line.\nSecond line.\nThird line.\n",
                 "The content of the text file after appending text lines");
     }
 

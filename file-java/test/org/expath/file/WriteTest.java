@@ -13,10 +13,10 @@ package org.expath.file;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import static org.expath.file.TestTools.assertFileEquals;
 import org.expath.tools.model.Element;
 import org.expath.tools.model.Sequence;
 import org.expath.tools.model.dom.DomElement;
-import static org.testng.Assert.*;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -41,8 +41,7 @@ public class WriteTest
         String file = WRITE_01.getAbsolutePath();
         InputOutput sut = new InputOutput();
         sut.write(file, seq);
-        String result = TestTools.readTextFile(WRITE_01);
-        assertEquals(result, "First line.\n",
+        assertFileEquals(WRITE_01, "First line.\n",
                 "The content of the text file after write");
     }
 
@@ -56,8 +55,7 @@ public class WriteTest
         String file = WRITE_02.getAbsolutePath();
         InputOutput sut = new InputOutput();
         sut.write(file, seq);
-        String result = TestTools.readTextFile(WRITE_02);
-        assertEquals(result, "First line.\n",
+        assertFileEquals(WRITE_02, "First line.\n",
                 "The content of the text file after write");
     }
 
@@ -69,9 +67,9 @@ public class WriteTest
         String file = WRITE_03.getAbsolutePath();
         InputOutput sut = new InputOutput();
         sut.writeBinary(file, bytes);
-        byte[] result = TestTools.readBinFile(WRITE_03);
         byte[] expect = { 0b100, 0b101, 0b110, 0b111 };
-        assertEquals(result, expect, "The content of the binary file after write");
+        assertFileEquals(WRITE_03, expect,
+                "The content of the binary file after write");
     }
 
     // TODO: Add tests with encoding.
@@ -83,8 +81,7 @@ public class WriteTest
         String file = WRITE_04.getAbsolutePath();
         InputOutput sut = new InputOutput();
         sut.writeText(file, str);
-        String result = TestTools.readTextFile(WRITE_04);
-        assertEquals(result, "First line.\n",
+        assertFileEquals(WRITE_04, "First line.\n",
                 "The content of the text file after writing text");
     }
 
@@ -99,8 +96,7 @@ public class WriteTest
         String file = WRITE_05.getAbsolutePath();
         InputOutput sut = new InputOutput();
         sut.writeTextLines(file, lines);
-        String result = TestTools.readTextFile(WRITE_05);
-        assertEquals(result, "First line.\nSecond line.\nThird line.\n",
+        assertFileEquals(WRITE_05, "First line.\nSecond line.\nThird line.\n",
                 "The content of the text file after writing text lines");
     }
 
