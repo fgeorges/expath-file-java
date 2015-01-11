@@ -108,7 +108,7 @@ public class WriteTest
     public static void setUpClass()
             throws Exception
     {
-        WRITE    = TestTools.initArea("append");
+        WRITE    = TestTools.initArea("write");
         WRITE_01 = new File(WRITE, "first.txt");
         WRITE_02 = new File(WRITE, "second.txt");
         WRITE_03 = new File(WRITE, "third.bin");
