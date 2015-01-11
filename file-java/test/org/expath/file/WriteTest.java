@@ -41,7 +41,7 @@ public class WriteTest
         String file = WRITE_01.getAbsolutePath();
         InputOutput sut = new InputOutput();
         sut.write(file, seq);
-        String result = AppendTest.readTextFile(WRITE_01);
+        String result = TestTools.readTextFile(WRITE_01);
         assertEquals(result, "First line.\n",
                 "The content of the text file after write");
     }
@@ -56,7 +56,7 @@ public class WriteTest
         String file = WRITE_02.getAbsolutePath();
         InputOutput sut = new InputOutput();
         sut.write(file, seq);
-        String result = AppendTest.readTextFile(WRITE_02);
+        String result = TestTools.readTextFile(WRITE_02);
         assertEquals(result, "First line.\n",
                 "The content of the text file after write");
     }
@@ -69,7 +69,7 @@ public class WriteTest
         String file = WRITE_03.getAbsolutePath();
         InputOutput sut = new InputOutput();
         sut.writeBinary(file, bytes);
-        byte[] result = AppendTest.readBinFile(WRITE_03);
+        byte[] result = TestTools.readBinFile(WRITE_03);
         byte[] expect = { 0b100, 0b101, 0b110, 0b111 };
         assertEquals(result, expect, "The content of the binary file after write");
     }
@@ -83,7 +83,7 @@ public class WriteTest
         String file = WRITE_04.getAbsolutePath();
         InputOutput sut = new InputOutput();
         sut.writeText(file, str);
-        String result = AppendTest.readTextFile(WRITE_04);
+        String result = TestTools.readTextFile(WRITE_04);
         assertEquals(result, "First line.\n",
                 "The content of the text file after writing text");
     }
@@ -99,7 +99,7 @@ public class WriteTest
         String file = WRITE_05.getAbsolutePath();
         InputOutput sut = new InputOutput();
         sut.writeTextLines(file, lines);
-        String result = AppendTest.readTextFile(WRITE_05);
+        String result = TestTools.readTextFile(WRITE_05);
         assertEquals(result, "First line.\nSecond line.\nThird line.\n",
                 "The content of the text file after writing text lines");
     }
@@ -112,20 +112,24 @@ public class WriteTest
     public static void setUpClass()
             throws Exception
     {
-        // factorize out in a test utility class
-        AppendTest.setUpClass();
+        WRITE    = TestTools.initArea("append");
+        WRITE_01 = new File(WRITE, "first.txt");
+        WRITE_02 = new File(WRITE, "second.txt");
+        WRITE_03 = new File(WRITE, "third.bin");
+        WRITE_04 = new File(WRITE, "fourth.txt");
+        WRITE_05 = new File(WRITE, "fifth.txt");
     }
 
     // ----------------------------------------------------------------------
     //   Setup utility functions
     // ----------------------------------------------------------------------
 
-    private static final File   WRITE    = new File(AppendTest.STAGE, "write");
-    private static final File   WRITE_01 = new File(WRITE, "first.txt");
-    private static final File   WRITE_02 = new File(WRITE, "second.txt");
-    private static final File   WRITE_03 = new File(WRITE, "third.bin");
-    private static final File   WRITE_04 = new File(WRITE, "fourth.txt");
-    private static final File   WRITE_05 = new File(WRITE, "fifth.txt");
+    private static File WRITE    = null;
+    private static File WRITE_01 = null;
+    private static File WRITE_02 = null;
+    private static File WRITE_03 = null;
+    private static File WRITE_04 = null;
+    private static File WRITE_05 = null;
 }
 
 

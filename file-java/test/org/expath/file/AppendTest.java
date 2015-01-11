@@ -10,16 +10,7 @@
 
 package org.expath.file;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import org.expath.tools.model.Element;
@@ -50,7 +41,7 @@ public class AppendTest
         String file = APPEND_01.getAbsolutePath();
         InputOutput sut = new InputOutput();
         sut.append(file, seq);
-        String result = readTextFile(APPEND_01);
+        String result = TestTools.readTextFile(APPEND_01);
         assertEquals(result, "First line.\nSecond line.\n",
                 "The content of the text file after append");
     }
@@ -63,7 +54,7 @@ public class AppendTest
         String file = APPEND_02.getAbsolutePath();
         InputOutput sut = new InputOutput();
         sut.appendBinary(file, bytes);
-        byte[] result = readBinFile(APPEND_02);
+        byte[] result = TestTools.readBinFile(APPEND_02);
         byte[] expect = { 0b0, 0b1, 0b10, 0b11, 0b100, 0b101, 0b110, 0b111 };
         assertEquals(result, expect, "The content of the binary file after append");
     }
@@ -77,7 +68,7 @@ public class AppendTest
         String file = APPEND_03.getAbsolutePath();
         InputOutput sut = new InputOutput();
         sut.appendText(file, str);
-        String result = readTextFile(APPEND_03);
+        String result = TestTools.readTextFile(APPEND_03);
         assertEquals(result, "First line.\nSecond line.\n",
                 "The content of the text file after appending text");
     }
@@ -92,37 +83,9 @@ public class AppendTest
         String file = APPEND_04.getAbsolutePath();
         InputOutput sut = new InputOutput();
         sut.appendTextLines(file, lines);
-        String result = readTextFile(APPEND_04);
+        String result = TestTools.readTextFile(APPEND_04);
         assertEquals(result, "First line.\nSecond line.\nThird line.\n",
                 "The content of the text file after appending text lines");
-    }
-
-    // ----------------------------------------------------------------------
-    //   Utility functions
-    // ----------------------------------------------------------------------
-
-    // factorize out in a test utility class
-    static String readTextFile(File f)
-            throws IOException
-    {
-        try ( BufferedReader in = new BufferedReader(new FileReader(f)) ) {
-            StringBuilder buf = new StringBuilder();
-            String line = in.readLine();
-            while ( line != null ) {
-                buf.append(line);
-                buf.append(System.lineSeparator());
-                line = in.readLine();
-            }
-            return buf.toString();
-        }
-    }
-
-    // factorize out in a test utility class
-    static byte[] readBinFile(File f)
-            throws IOException
-    {
-        Path p = f.toPath();
-        return Files.readAllBytes(p);
     }
 
     // ----------------------------------------------------------------------
@@ -133,104 +96,18 @@ public class AppendTest
     public static void setUpClass()
             throws Exception
     {
-        // validate dirs exist
-        validateDir(PWD);
-        validateDir(RSRC);
-        validateDir(INITIAL);
-        validateDir(STAGE);
-        // delete test-src/stage/
-        deleteDir(STAGE);
-        // copy test-rsrc/initial/ to test-src/stage/ again
-        copyDir(INITIAL, STAGE);
-        // create "append #2"
-        writeBin(APPEND_02, 0b0, 0b1, 0b10, 0b11);
+        APPEND    = TestTools.initArea("append");
+        APPEND_01 = new File(APPEND, "first.txt");
+        APPEND_02 = new File(APPEND, "second.bin");
+        APPEND_03 = new File(APPEND, "third.txt");
+        APPEND_04 = new File(APPEND, "fourth.txt");
     }
 
-    // ----------------------------------------------------------------------
-    //   Setup utility functions
-    // ----------------------------------------------------------------------
-
-    private static void validateDir(File d)
-    {
-        if ( ! d.exists() ) {
-            throw new RuntimeException("Directory does not exist: " + d);
-        }
-        if ( ! d.isDirectory() ) {
-            throw new RuntimeException("Directory is not a directory: " + d);
-        }
-    }
-
-    private static boolean deleteDir(File f)
-    {
-        if ( f.isDirectory() ) {
-            boolean res = true;
-            for ( File child : f.listFiles() ) {
-                res = deleteDir(child) && res;
-            }
-            res = f.delete() && res;
-            return res;
-        }
-        else {
-            return f.delete();
-        }
-    }
-
-    private static void copyDir(File from, File to)
-    {
-        File[] files = from.listFiles();
-        if ( files == null ) {  // null if security restricted
-            throw new RuntimeException("Failed to list contents of " + from);
-        }
-        if ( to.exists() ) {
-            throw new RuntimeException("Destination '" + to + "' exists");
-        }
-        if ( ! to.mkdirs() ) {
-            throw new RuntimeException("Destination '" + to + "' directory cannot be created");
-        }
-        if ( ! to.canWrite() ) {
-            throw new RuntimeException("Destination '" + to + "' cannot be written to");
-        }
-        for ( File file : files ) {
-            File copied = new File(to, file.getName());
-            if ( file.isDirectory() ) {
-                copyDir(file, copied);
-            }
-            else {
-                try {
-                    byte[] buffer = new byte[4096];
-                    InputStream in = new FileInputStream(file);
-                    OutputStream out = new FileOutputStream(copied);
-                    int count;
-                    while ( (count = in.read(buffer)) > 0 ) {
-                        out.write(buffer, 0, count);
-                    }
-                }
-                catch ( IOException ex ) {
-                    throw new RuntimeException("Error copying '" + file + "' to '" + copied + "'", ex);
-                }
-            }
-        }
-    }
-
-    private static void writeBin(File f, int... bytes)
-            throws IOException
-    {
-        OutputStream out = new FileOutputStream(f);
-        for ( int b : bytes ) {
-            out.write(b);
-        }
-    }
-
-    private static final String PWD_PROP  = System.getProperty("user.dir");
-    private static final File   PWD       = new File(PWD_PROP);
-    private static final File   RSRC      = new File(PWD, "test-rsrc");
-    private static final File   INITIAL   = new File(RSRC, "initial");
-            static final File   STAGE     = new File(RSRC, "stage");
-    private static final File   APPEND    = new File(STAGE, "append");
-    private static final File   APPEND_01 = new File(APPEND, "first.txt");
-    private static final File   APPEND_02 = new File(APPEND, "second.bin");
-    private static final File   APPEND_03 = new File(APPEND, "third.txt");
-    private static final File   APPEND_04 = new File(APPEND, "fourth.txt");
+    private static File APPEND    = null;
+    private static File APPEND_01 = null;
+    private static File APPEND_02 = null;
+    private static File APPEND_03 = null;
+    private static File APPEND_04 = null;
 }
 
 
