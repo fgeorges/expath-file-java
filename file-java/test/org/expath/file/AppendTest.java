@@ -26,12 +26,11 @@ import org.expath.tools.model.Element;
 import org.expath.tools.model.Sequence;
 import org.expath.tools.model.dom.DomElement;
 import static org.testng.Assert.*;
-import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 /**
- * Test for the `append` functions in {@link InputOutput}.
+ * Test for the `append*` functions in {@link InputOutput}.
  * 
  * @author Florent Georges
  * @date   2015-01-09
@@ -80,7 +79,7 @@ public class AppendTest
         sut.appendText(file, str);
         String result = readTextFile(APPEND_03);
         assertEquals(result, "First line.\nSecond line.\n",
-                "The content of the text file after text append");
+                "The content of the text file after appending text");
     }
 
     @Test
@@ -95,14 +94,15 @@ public class AppendTest
         sut.appendTextLines(file, lines);
         String result = readTextFile(APPEND_04);
         assertEquals(result, "First line.\nSecond line.\nThird line.\n",
-                "The content of the text file after text append");
+                "The content of the text file after appending text lines");
     }
 
     // ----------------------------------------------------------------------
     //   Utility functions
     // ----------------------------------------------------------------------
 
-    private String readTextFile(File f)
+    // factorize out in a test utility class
+    static String readTextFile(File f)
             throws IOException
     {
         try ( BufferedReader in = new BufferedReader(new FileReader(f)) ) {
@@ -117,17 +117,12 @@ public class AppendTest
         }
     }
 
-    private byte[] readBinFile(File f)
+    // factorize out in a test utility class
+    static byte[] readBinFile(File f)
             throws IOException
     {
         Path p = f.toPath();
         return Files.readAllBytes(p);
-    }
-
-    @AfterClass
-    public static void tearDownClass()
-            throws Exception
-    {
     }
 
     // ----------------------------------------------------------------------
@@ -230,7 +225,7 @@ public class AppendTest
     private static final File   PWD       = new File(PWD_PROP);
     private static final File   RSRC      = new File(PWD, "test-rsrc");
     private static final File   INITIAL   = new File(RSRC, "initial");
-    private static final File   STAGE     = new File(RSRC, "stage");
+            static final File   STAGE     = new File(RSRC, "stage");
     private static final File   APPEND    = new File(STAGE, "append");
     private static final File   APPEND_01 = new File(APPEND, "first.txt");
     private static final File   APPEND_02 = new File(APPEND, "second.bin");
