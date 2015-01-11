@@ -16,6 +16,7 @@ import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.RandomAccessFile;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.util.List;
@@ -56,31 +57,13 @@ public class InputOutput
     public void append(String file, Sequence items, Element params)
             throws FileException
     {
-        try {
-            SerialParameters sp = SerialParameters.parse(params);
-            append(file, items, sp);
-        }
-        catch ( ToolsException ex ) {
-            throw FileException.ioError("Error parsing the serialization parameters", ex);
-        }
+        write(file, items, params, true);
     }
 
     public void append(String file, Sequence items, SerialParameters params)
             throws FileException
     {
-        ensureNotNull(file, "file cannot be null");
-        ensureNotNull(items, "items cannot be null");
-        OutputStream out = null;
-        try {
-            out = openOutputStream(file, true);
-            items.serialize(out, params);
-        }
-        catch ( ToolsException ex ) {
-            throw FileException.ioError("Error serializing to the file: " + file, ex);
-        }
-        finally {
-            close(out);
-        }
+        write(file, items, params, true);
     }
 
     // file:append-binary($file as xs:string,
@@ -91,19 +74,7 @@ public class InputOutput
     public void appendBinary(String file, byte[] value)
             throws FileException
     {
-        ensureNotNull(file, "file cannot be null");
-        ensureNotNull(value, "value cannot be null");
-        OutputStream out = null;
-        try {
-            out = openOutputStream(file, true);
-            out.write(value);
-        }
-        catch ( IOException ex ) {
-            throw FileException.ioError("Error writing binary to the file: " + file, ex);
-        }
-        finally {
-            close(out);
-        }
+        writeBinary(file, value, true);
     }
 
     // file:append-text($file as xs:string,
@@ -118,42 +89,13 @@ public class InputOutput
     public void appendText(String file, String value)
             throws FileException
     {
-        ensureNotNull(file, "file cannot be null");
-        ensureNotNull(value, "value cannot be null");
-        Writer out = null;
-        try {
-            out = openWriter(file, true);
-            out.write(value);
-        }
-        catch ( IOException ex ) {
-            throw FileException.ioError("Error writing text to the file: " + file, ex);
-        }
-        finally {
-            close(out);
-        }
+        writeText(file, value, true);
     }
 
     public void appendText(String file, String value, String encoding)
             throws FileException
     {
-        ensureNotNull(file, "file cannot be null");
-        ensureNotNull(value, "value cannot be null");
-        ensureNotNull(encoding, "encoding cannot be null");
-        OutputStream out = null;
-        try {
-            out = openOutputStream(file, true);
-            byte[] bytes = value.getBytes(encoding);
-            out.write(bytes);
-        }
-        catch ( UnsupportedEncodingException ex ) {
-            throw FileException.unknownEncoding("Unsupported encoding: " + encoding, ex);
-        }
-        catch ( IOException ex ) {
-            throw FileException.ioError("Error writing text to the file: " + file, ex);
-        }
-        finally {
-            close(out);
-        }
+        writeText(file, value, encoding, true);
     }
 
     // file:append-text-lines($file as xs:string,
@@ -168,23 +110,13 @@ public class InputOutput
     public void appendTextLines(String file, List<String> values)
             throws FileException
     {
-        ensureNotNull(file, "file cannot be null");
-        ensureNotNull(values, "values cannot be null");
-        final String nl = Properties.lineSeparator();
-        Writer out = null;
-        try {
-            out = openWriter(file, true);
-            for ( String line : values ) {
-                out.write(line);
-                out.write(nl);
-            }
-        }
-        catch ( IOException ex ) {
-            throw FileException.ioError("Error writing text to the file: " + file, ex);
-        }
-        finally {
-            close(out);
-        }
+        writeTextLines(file, values, true);
+    }
+
+    public void appendTextLines(String file, List<String> values, String encoding)
+            throws FileException
+    {
+        writeTextLines(file, values, encoding, true);
     }
 
     // ----------------------------------------------------------------------
@@ -318,60 +250,274 @@ public class InputOutput
     //   Write
     // ----------------------------------------------------------------------
 
-//    // file:write($file as xs:string,
-//    //            $items as item()*) as empty-sequence()
-//    // file:write($file as xs:string,
-//    //            $items as item()*,
-//    //            $params as element(output:serialization-parameters)) as empty-sequence()
-//    // [file:no-dir] is raised if the parent directory of $file does not exist.
-//    // [file:is-dir] is raised if $file points to a directory.
-//    // [file:io-error] is raised if any other error occurs.
-//    public void write()
-//    {
-//        ...
-//    }
-//
-//    // file:write-binary($file as xs:string,
-//    //                   $value as xs:base64Binary) as empty-sequence()
-//    // file:write-binary($file as xs:string,
-//    //                   $value as xs:base64Binary,
-//    //                   $offset as xs:integer) as empty-sequence()
-//    // [file:no-dir] is raised if the parent directory of $file does not exist.
-//    // [file:is-dir] is raised if $file points to a directory.
-//    // [file:out-of-range] is raised if $offset is negative, or if it exceeds the current file size.
-//    // [file:io-error] is raised if any other error occurs.
-//    public void writeBinary()
-//    {
-//        ...
-//    }
-//
-//    // file:write-text($file as xs:string,
-//    //                 $value as xs:string) as empty-sequence()
-//    // file:write-text($file as xs:string,
-//    //                 $value as xs:string,
-//    //                 $encoding as xs:string) as empty-sequence()
-//    // [file:no-dir] is raised if the parent directory of $file does not exist.
-//    // [file:is-dir] is raised if $file points to a directory.
-//    // [file:unknown-encoding] is raised if $encoding is invalid or not supported by the implementation.
-//    // [file:io-error] is raised if any other error occurs.
-//    public void writeText()
-//    {
-//        ...
-//    }
-//
-//    // file:write-text-lines($file as xs:string,
-//    //                       $values as xs:string*) as empty-sequence()
-//    // file:write-text-lines($file as xs:string,
-//    //                       $values as xs:string*,
-//    //                       $encoding as xs:string) as empty-sequence()
-//    // [file:no-dir] is raised if the parent directory of $file does not exist.
-//    // [file:is-dir] is raised if $file points to a directory.
-//    // [file:unknown-encoding] is raised if $encoding is invalid or not supported by the implementation.
-//    // [file:io-error] is raised if any other error occurs.
-//    public void writeTextLines()
-//    {
-//        ...
-//    }
+    // file:write($file as xs:string,
+    //            $items as item()*) as empty-sequence()
+    // file:write($file as xs:string,
+    //            $items as item()*,
+    //            $params as element(output:serialization-parameters)) as empty-sequence()
+    // [file:no-dir] is raised if the parent directory of $file does not exist.
+    // [file:is-dir] is raised if $file points to a directory.
+    // [file:io-error] is raised if any other error occurs.
+    public void write(String file, Sequence items)
+            throws FileException
+    {
+        SerialParameters params = new SerialParameters();
+        write(file, items, params);
+    }
+
+    public void write(String file, Sequence items, Element params)
+            throws FileException
+    {
+        write(file, items, params, false);
+    }
+
+    public void write(String file, Sequence items, SerialParameters params)
+            throws FileException
+    {
+        write(file, items, params, false);
+    }
+
+    private void write(String file, Sequence items, Element params, boolean append)
+            throws FileException
+    {
+        try {
+            SerialParameters sp = SerialParameters.parse(params);
+            write(file, items, sp, append);
+        }
+        catch ( ToolsException ex ) {
+            throw FileException.ioError("Error parsing the serialization parameters", ex);
+        }
+    }
+
+    private void write(String file, Sequence items, SerialParameters params, boolean append)
+            throws FileException
+    {
+        ensureNotNull(file, "file cannot be null");
+        ensureNotNull(items, "items cannot be null");
+        OutputStream out = null;
+        try {
+            out = openOutputStream(file, append);
+            items.serialize(out, params);
+        }
+        catch ( ToolsException ex ) {
+            throw FileException.ioError("Error serializing to the file: " + file, ex);
+        }
+        finally {
+            close(out);
+        }
+    }
+
+    // file:write-binary($file as xs:string,
+    //                   $value as xs:base64Binary) as empty-sequence()
+    // file:write-binary($file as xs:string,
+    //                   $value as xs:base64Binary,
+    //                   $offset as xs:integer) as empty-sequence()
+    // [file:no-dir] is raised if the parent directory of $file does not exist.
+    // [file:is-dir] is raised if $file points to a directory.
+    // [file:out-of-range] is raised if $offset is negative, or if it exceeds the current file size.
+    // [file:io-error] is raised if any other error occurs.
+    public void writeBinary(String file, byte[] value)
+            throws FileException
+    {
+        writeBinary(file, value, false);
+    }
+
+    public void writeBinary(String file, byte[] value, int offset)
+            throws FileException
+    {
+        // is offset negative?
+        if ( offset < 0 ) {
+            throw FileException.outOfRange("Offset is negative: " + offset);
+        }
+        // open the file
+        RandomAccessFile f = openRandomAccess(file);
+        // global try/catch to properly close the file, whatever exec path is taken
+        try {
+            // get its length
+            long len;
+            try {
+                len = f.length();
+            }
+            catch ( IOException ex ) {
+                throw FileException.ioError("Error getting the size of the file: " + file, ex);
+            }
+            // is offset greater than file size?
+            if ( offset > len ) {
+                throw FileException.outOfRange("Offset (" + offset + ") is greater than the file size (" + len + "): " + file);
+            }
+            // position to offset
+            try {
+                f.seek(offset);
+            }
+            catch ( IOException ex ) {
+                throw FileException.ioError("Error seeking to offset (" + offset + ") on the file: " + file, ex);
+            }
+            // write it!
+            f.write(value);
+        }
+        catch ( IOException ex ) {
+            throw FileException.ioError("Error writing at offset (" + offset + ") "
+                    + value.length + " bytes in the file: " + file, ex);
+        }
+        finally {
+            close(f);
+        }
+    }
+
+    private void writeBinary(String file, byte[] value, boolean append)
+            throws FileException
+    {
+        ensureNotNull(file, "file cannot be null");
+        ensureNotNull(value, "value cannot be null");
+        OutputStream out = null;
+        try {
+            out = openOutputStream(file, append);
+            out.write(value);
+        }
+        catch ( IOException ex ) {
+            throw FileException.ioError("Error writing binary to the file: " + file, ex);
+        }
+        finally {
+            close(out);
+        }
+    }
+
+    // file:write-text($file as xs:string,
+    //                 $value as xs:string) as empty-sequence()
+    // file:write-text($file as xs:string,
+    //                 $value as xs:string,
+    //                 $encoding as xs:string) as empty-sequence()
+    // [file:no-dir] is raised if the parent directory of $file does not exist.
+    // [file:is-dir] is raised if $file points to a directory.
+    // [file:unknown-encoding] is raised if $encoding is invalid or not supported by the implementation.
+    // [file:io-error] is raised if any other error occurs.
+    public void writeText(String file, String value)
+            throws FileException
+    {
+        writeText(file, value, false);
+    }
+
+    public void writeText(String file, String value, String encoding)
+            throws FileException
+    {
+        writeText(file, value, encoding, false);
+    }
+
+    private void writeText(String file, String value, boolean append)
+            throws FileException
+    {
+        ensureNotNull(file, "file cannot be null");
+        ensureNotNull(value, "value cannot be null");
+        Writer out = null;
+        try {
+            out = openWriter(file, append);
+            out.write(value);
+        }
+        catch ( IOException ex ) {
+            throw FileException.ioError("Error writing text to the file: " + file, ex);
+        }
+        finally {
+            close(out);
+        }
+    }
+
+    private void writeText(String file, String value, String encoding, boolean append)
+            throws FileException
+    {
+        ensureNotNull(file, "file cannot be null");
+        ensureNotNull(value, "value cannot be null");
+        ensureNotNull(encoding, "encoding cannot be null");
+        OutputStream out = null;
+        try {
+            out = openOutputStream(file, append);
+            byte[] bytes = value.getBytes(encoding);
+            out.write(bytes);
+        }
+        catch ( UnsupportedEncodingException ex ) {
+            throw FileException.unknownEncoding("Unsupported encoding: " + encoding, ex);
+        }
+        catch ( IOException ex ) {
+            throw FileException.ioError("Error writing text to the file: " + file, ex);
+        }
+        finally {
+            close(out);
+        }
+    }
+
+    // file:write-text-lines($file as xs:string,
+    //                       $values as xs:string*) as empty-sequence()
+    // file:write-text-lines($file as xs:string,
+    //                       $values as xs:string*,
+    //                       $encoding as xs:string) as empty-sequence()
+    // [file:no-dir] is raised if the parent directory of $file does not exist.
+    // [file:is-dir] is raised if $file points to a directory.
+    // [file:unknown-encoding] is raised if $encoding is invalid or not supported by the implementation.
+    // [file:io-error] is raised if any other error occurs.
+    public void writeTextLines(String file, List<String> values)
+            throws FileException
+    {
+        writeTextLines(file, values, false);
+    }
+
+    public void writeTextLines(String file, List<String> values, String encoding)
+            throws FileException
+    {
+        writeTextLines(file, values, encoding, false);
+    }
+
+    private void writeTextLines(String file, List<String> values, boolean append)
+            throws FileException
+    {
+        ensureNotNull(file, "file cannot be null");
+        ensureNotNull(values, "values cannot be null");
+        final String nl = Properties.lineSeparator();
+        Writer out = null;
+        try {
+            out = openWriter(file, append);
+            for ( String line : values ) {
+                out.write(line);
+                out.write(nl);
+            }
+        }
+        catch ( IOException ex ) {
+            throw FileException.ioError("Error writing text to the file: " + file, ex);
+        }
+        finally {
+            close(out);
+        }
+    }
+
+    private void writeTextLines(String file, List<String> values, String encoding, boolean append)
+            throws FileException
+    {
+        ensureNotNull(file, "file cannot be null");
+        ensureNotNull(values, "values cannot be null");
+        ensureNotNull(encoding, "encoding cannot be null");
+        // get the newline separator, as bytes
+        final String nlstr = Properties.lineSeparator();
+        final byte[] nl;
+        try {
+            nl = nlstr.getBytes(encoding);
+        }
+        catch ( UnsupportedEncodingException ex ) {
+            throw FileException.unknownEncoding("Unsupported encoding: " + encoding, ex);
+        }
+        OutputStream out = null;
+        try {
+            out = openOutputStream(file, true);
+            for ( String line : values ) {
+                byte[] bytes = line.getBytes(encoding);
+                out.write(bytes);
+                out.write(nl);
+            }
+        }
+        catch ( IOException ex ) {
+            throw FileException.ioError("Error writing text to the file: " + file, ex);
+        }
+        finally {
+            close(out);
+        }
+    }
 
     // ----------------------------------------------------------------------
     //   Utility functions
@@ -410,6 +556,19 @@ public class InputOutput
         }
     }
 
+    private void close(RandomAccessFile f)
+            throws FileException
+    {
+        if ( f != null ) {
+            try {
+                f.close();
+            }
+            catch ( IOException ex ) {
+                throw FileException.ioError("Error closing the random-access file", ex);
+            }
+        }
+    }
+
     private Writer openWriter(String file, boolean append)
             throws FileException
     {
@@ -434,6 +593,25 @@ public class InputOutput
         File f = new File(file);
         try {
             return new FileOutputStream(f, append);
+        }
+        catch ( FileNotFoundException ex ) {
+            if ( f.isDirectory() ) {
+                throw FileException.isDir("The file already exists and is a directory: " + file, ex);
+            }
+            if ( ! f.exists() && ! f.getParentFile().isDirectory() ) {
+                throw FileException.isDir("The file must be created and its directory does not exist: " + file, ex);
+            }
+            throw FileException.ioError("Error creating or opening the file: " + file, ex);
+        }
+    }
+
+    private RandomAccessFile openRandomAccess(String file)
+            throws FileException
+    {
+        File f = new File(file);
+        RandomAccessFile raf;
+        try {
+            return new RandomAccessFile(f, "rw");
         }
         catch ( FileNotFoundException ex ) {
             if ( f.isDirectory() ) {
