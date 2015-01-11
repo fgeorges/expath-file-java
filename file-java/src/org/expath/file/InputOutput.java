@@ -35,8 +35,12 @@ import org.expath.tools.serial.SerialParameters;
  */
 public class InputOutput
 {
-    // ----------------------------------------------------------------------
+    // ======================================================================
     //   Append
+    //   ======
+    // 
+    //   All the `append*` functions in the spec.  They all are implemented
+    //   using the corresponding `write*` implementations.
     // ----------------------------------------------------------------------
 
     // file:append($file as xs:string,
@@ -119,8 +123,11 @@ public class InputOutput
         writeTextLines(file, values, encoding, true);
     }
 
-    // ----------------------------------------------------------------------
+    // ======================================================================
     //   Misc
+    //   ====
+    // 
+    //   Miscellaneous functions from spec.
     // ----------------------------------------------------------------------
 
 //    // file:copy($source as xs:string,
@@ -203,8 +210,11 @@ public class InputOutput
 //        ...
 //    }
 
-    // ----------------------------------------------------------------------
+    // ======================================================================
     //   Read
+    //   ====
+    // 
+    //   All the read* functions in the spec.
     // ----------------------------------------------------------------------
 
 //    // file:read-binary($file as xs:string) as xs:base64Binary
@@ -246,8 +256,14 @@ public class InputOutput
 //        ...
 //    }
 
-    // ----------------------------------------------------------------------
+    // ======================================================================
     //   Write
+    //   =====
+    // 
+    //   All the `write*` functions in the spec.  They are all implemented
+    //   with private functions taking an extra `append` parameter, telling
+    //   whether it is a regular write or an append.  The same private
+    //   functions are used from the `append*` functions.
     // ----------------------------------------------------------------------
 
     // file:write($file as xs:string,
@@ -519,8 +535,11 @@ public class InputOutput
         }
     }
 
-    // ----------------------------------------------------------------------
-    //   Utility functions
+    // ======================================================================
+    //   Utility
+    //   =======
+    // 
+    //   Utility functions.
     // ----------------------------------------------------------------------
 
     private void ensureNotNull(Object obj, String msg)
