@@ -123,10 +123,6 @@ public class CopyTest
         FILE_TO_NEW  = new File(COPY, "file-to-new");
     }
 
-    // ----------------------------------------------------------------------
-    //   Setup utility functions
-    // ----------------------------------------------------------------------
-
     private static File COPY         = null;
     private static File DIR_TO_DIR   = null;
     private static File DIR_TO_FILE  = null;

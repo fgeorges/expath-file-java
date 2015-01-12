@@ -102,10 +102,6 @@ public class ReadTest
         READ_03 = new File(READ, "third.txt");
     }
 
-    // ----------------------------------------------------------------------
-    //   Setup utility functions
-    // ----------------------------------------------------------------------
-
     private static File READ    = null;
     private static File READ_01 = null;
     private static File READ_02 = null;

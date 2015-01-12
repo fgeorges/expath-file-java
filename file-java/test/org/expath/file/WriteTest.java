@@ -116,10 +116,6 @@ public class WriteTest
         WRITE_05 = new File(WRITE, "fifth.txt");
     }
 
-    // ----------------------------------------------------------------------
-    //   Setup utility functions
-    // ----------------------------------------------------------------------
-
     private static File WRITE    = null;
     private static File WRITE_01 = null;
     private static File WRITE_02 = null;
