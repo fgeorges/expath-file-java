@@ -331,7 +331,7 @@ public class Write
     {
         Util.ensureNotNull(file, "file cannot be null");
         Util.ensureNotNull(values, "values cannot be null");
-        final String nl = Properties.lineSeparator();
+        final String nl = new Properties().lineSeparator();
         Writer out = null;
         try {
             out = Util.openWriter(file, append);
@@ -355,7 +355,7 @@ public class Write
         Util.ensureNotNull(values, "values cannot be null");
         Util.ensureNotNull(encoding, "encoding cannot be null");
         // get the newline separator, as bytes
-        final String nlstr = Properties.lineSeparator();
+        final String nlstr = new Properties().lineSeparator();
         final byte[] nl;
         try {
             nl = nlstr.getBytes(encoding);
