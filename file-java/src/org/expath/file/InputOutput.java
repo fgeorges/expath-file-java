@@ -10,15 +10,24 @@
 
 package org.expath.file;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.RandomAccessFile;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
+import java.nio.charset.Charset;
+import java.nio.charset.IllegalCharsetNameException;
+import java.nio.charset.StandardCharsets;
+import java.nio.charset.UnsupportedCharsetException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 import org.expath.tools.model.Sequence;
 import org.expath.tools.ToolsException;
@@ -217,44 +226,120 @@ public class InputOutput
     //   All the read* functions in the spec.
     // ----------------------------------------------------------------------
 
-//    // file:read-binary($file as xs:string) as xs:base64Binary
-//    // file:read-binary($file as xs:string,
-//    //                  $offset as xs:integer) as xs:base64Binary
-//    // file:read-binary($file as xs:string,
-//    //                  $offset as xs:integer,
-//    //                  $length as xs:integer) as xs:base64Binary
-//    // [file:not-found] is raised if $file does not exist.
-//    // [file:is-dir] is raised if $file points to a directory.
-//    // [file:out-of-range] is raised if $offset or $length is negative, or if the chosen values would exceed the file bounds.
-//    // [file:io-error] is raised if any other error occurs.
-//    public void readBinary()
-//    {
-//        ...
-//    }
-//
-//    // file:read-text($file as xs:string) as xs:string
-//    // file:read-text($file as xs:string,
-//    //                $encoding as xs:string) as xs:string
-//    // [file:not-found] is raised if $file does not exist.
-//    // [file:is-dir] is raised if $file points to a directory.
-//    // [file:unknown-encoding] is raised if $encoding is invalid or not supported by the implementation.
-//    // [file:io-error] is raised if any other error occurs.
-//    public void readText()
-//    {
-//        ...
-//    }
-//
-//    // file:read-text-lines($file as xs:string) as xs:string*
-//    // file:read-text-lines($file as xs:string,
-//    //                      $encoding as xs:string) as xs:string*
-//    // [file:not-found] is raised if $file does not exist.
-//    // [file:is-dir] is raised if $file points to a directory.
-//    // [file:unknown-encoding] is raised if $encoding is invalid or not supported by the implementation.
-//    // [file:io-error] is raised if any other error occurs.
-//    public void readTextLines()
-//    {
-//        ...
-//    }
+    // file:read-binary($file as xs:string) as xs:base64Binary
+    // file:read-binary($file as xs:string,
+    //                  $offset as xs:integer) as xs:base64Binary
+    // file:read-binary($file as xs:string,
+    //                  $offset as xs:integer,
+    //                  $length as xs:integer) as xs:base64Binary
+    // [file:not-found] is raised if $file does not exist.
+    // [file:is-dir] is raised if $file points to a directory.
+    // [file:out-of-range] is raised if $offset or $length is negative, or if the chosen values would exceed the file bounds.
+    // [file:io-error] is raised if any other error occurs.
+    public byte[] readBinary(String file)
+            throws FileException
+    {
+        try {
+            File f = openFile(file);
+            Path p = f.toPath();
+            return Files.readAllBytes(p);
+        }
+        catch ( IOException ex ) {
+            throw FileException.ioError("Error reading from the file: " + file, ex);
+        }
+    }
+
+    public byte[] readBinary(String file, long offset)
+            throws FileException
+    {
+        InputStream in = openInputStream(file);
+        try {
+            in.skip(offset);
+            return readByteArray(in);
+        }
+        catch ( IOException ex ) {
+            throw FileException.ioError("Error reading from the file: " + file, ex);
+        }
+        finally {
+            close(in);
+        }
+    }
+
+    public byte[] readBinary(String file, long offset, long length)
+            throws FileException
+    {
+        InputStream in = openInputStream(file);
+        try {
+            in.skip(offset);
+            return readByteArray(in, length);
+        }
+        catch ( IOException ex ) {
+            throw FileException.ioError("Error reading from the file: " + file, ex);
+        }
+        finally {
+            close(in);
+        }
+    }
+
+    // file:read-text($file as xs:string) as xs:string
+    // file:read-text($file as xs:string,
+    //                $encoding as xs:string) as xs:string
+    // [file:not-found] is raised if $file does not exist.
+    // [file:is-dir] is raised if $file points to a directory.
+    // [file:unknown-encoding] is raised if $encoding is invalid or not supported by the implementation.
+    // [file:io-error] is raised if any other error occurs.
+    public String readText(String file)
+            throws FileException
+    {
+        return readText(file, StandardCharsets.UTF_8);
+    }
+
+    public String readText(String file, String encoding)
+            throws FileException
+    {
+        Charset cs = getCharset(encoding);
+        return readText(file, cs);
+    }
+
+    public String readText(String file, Charset encoding)
+            throws FileException
+    {
+        byte[] bytes = readBinary(file);
+        return new String(bytes, encoding);
+    }
+
+    // file:read-text-lines($file as xs:string) as xs:string*
+    // file:read-text-lines($file as xs:string,
+    //                      $encoding as xs:string) as xs:string*
+    // [file:not-found] is raised if $file does not exist.
+    // [file:is-dir] is raised if $file points to a directory.
+    // [file:unknown-encoding] is raised if $encoding is invalid or not supported by the implementation.
+    // [file:io-error] is raised if any other error occurs.
+    public List<String> readTextLines(String file)
+            throws FileException
+    {
+        return readTextLines(file, StandardCharsets.UTF_8);
+    }
+
+    public List<String> readTextLines(String file, String encoding)
+            throws FileException
+    {
+        Charset cs = getCharset(encoding);
+        return readTextLines(file, cs);
+    }
+
+    public List<String> readTextLines(String file, Charset encoding)
+            throws FileException
+    {
+        try {
+            File f = openFile(file);
+            Path p = f.toPath();
+            return Files.readAllLines(p, encoding);
+        }
+        catch ( IOException ex ) {
+            throw FileException.ioError("Error reading from the file: " + file, ex);
+        }
+    }
 
     // ======================================================================
     //   Write
@@ -338,7 +423,7 @@ public class InputOutput
         writeBinary(file, value, false);
     }
 
-    public void writeBinary(String file, byte[] value, int offset)
+    public void writeBinary(String file, byte[] value, long offset)
             throws FileException
     {
         // is offset negative?
@@ -549,6 +634,71 @@ public class InputOutput
         }
     }
 
+    private Charset getCharset(String encoding)
+            throws FileException
+    {
+        try {
+            return Charset.forName(encoding);
+        }
+        catch ( IllegalCharsetNameException | UnsupportedCharsetException ex ) {
+            throw FileException.unknownEncoding("Unsupported encoding: " + encoding, ex);
+        }
+    }
+
+    private byte[] readByteArray(InputStream in)
+            throws IOException
+    {
+        // the buffer, 
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        int read;
+        byte[] buf = new byte[4096];
+        // suck it all
+        while ( (read = in.read(buf, 0, buf.length)) != -1 ) {
+            out.write(buf, 0, read);
+        }
+        // to byte[]
+        return out.toByteArray();
+    }
+
+    private byte[] readByteArray(InputStream in, long length)
+            throws FileException
+                 , IOException
+    {
+        // the buffer, 
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        int total = 0;
+        byte[] buf = new byte[4096];
+        // suck it all
+        while ( total < length ) {
+            long to_read = length - total;
+            if ( to_read > buf.length ) {
+                to_read = buf.length;
+            }
+            // casting to_read to int is safe, as it is at maximum buf.length
+            int read = in.read(buf, 0, (int) to_read);
+            if ( read < 0 ) {
+                throw FileException.outOfRange("Not enough bytes in file, read: " + total);
+            }
+            out.write(buf, 0, read);
+            total += read;
+        }
+        // to byte[]
+        return out.toByteArray();
+    }
+
+    private void close(InputStream in)
+            throws FileException
+    {
+        if ( in != null ) {
+            try {
+                in.close();
+            }
+            catch ( IOException ex ) {
+                throw FileException.ioError("Error closing the input stream", ex);
+            }
+        }
+    }
+
     private void close(OutputStream out)
             throws FileException
     {
@@ -585,6 +735,34 @@ public class InputOutput
             catch ( IOException ex ) {
                 throw FileException.ioError("Error closing the random-access file", ex);
             }
+        }
+    }
+
+    private File openFile(String file)
+            throws FileException
+    {
+        File f = new File(file);
+        if ( ! f.exists() ) {
+            throw FileException.notFound("File not found: " + file);
+        }
+        if ( f.isDirectory() ) {
+            throw FileException.notFound("File points to a directory: " + file);
+        }
+        return f;
+    }
+
+    private InputStream openInputStream(String file)
+            throws FileException
+    {
+        File f = new File(file);
+        try {
+            return new FileInputStream(f);
+        }
+        catch ( FileNotFoundException ex ) {
+            if ( f.isDirectory() ) {
+                throw FileException.isDir("File points to a directory: " + file, ex);
+            }
+            throw FileException.notFound("File not found: " + file, ex);
         }
     }
 
