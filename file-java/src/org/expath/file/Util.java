@@ -24,6 +24,9 @@ import java.io.Writer;
 import java.nio.charset.Charset;
 import java.nio.charset.IllegalCharsetNameException;
 import java.nio.charset.UnsupportedCharsetException;
+import java.nio.file.FileSystem;
+import java.nio.file.FileSystems;
+import java.nio.file.Path;
 
 /**
  * Utilities for implementing the functions of the EXPath File module.
@@ -33,6 +36,12 @@ import java.nio.charset.UnsupportedCharsetException;
  */
 class Util
 {
+    public static Path getPath(String path)
+    {
+        FileSystem fs = FileSystems.getDefault();
+        return fs.getPath(path);
+    }
+
     public static void ensureNotNull(Object obj, String msg)
     {
         if ( null == obj ) {

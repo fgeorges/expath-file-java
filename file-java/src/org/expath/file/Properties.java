@@ -12,8 +12,6 @@ package org.expath.file;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.FileSystem;
-import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
@@ -59,7 +57,8 @@ public class Properties
     // file:exists($path as xs:string) as xs:boolean
     public boolean exists(String path)
     {
-        return exists(getPath(path));
+        Path p = Util.getPath(path);
+        return exists(p);
     }
 
     public boolean exists(Path path)
@@ -70,7 +69,8 @@ public class Properties
     // file:is-dir($path as xs:string) as xs:boolean
     public boolean isDir(String path)
     {
-        return isDir(getPath(path));
+        Path p = Util.getPath(path);
+        return isDir(p);
     }
 
     public boolean isDir(Path path)
@@ -81,7 +81,8 @@ public class Properties
     // file:is-file($path as xs:string) as xs:boolean
     public boolean isFile(String path)
     {
-        return isFile(getPath(path));
+        Path p = Util.getPath(path);
+        return isFile(p);
     }
 
     public boolean isFile(Path path)
@@ -95,7 +96,8 @@ public class Properties
     public Date lastModified(String path)
             throws FileException
     {
-        return lastModified(getPath(path));
+        Path p = Util.getPath(path);
+        return lastModified(p);
     }
 
     public Date lastModified(Path path)
@@ -120,7 +122,8 @@ public class Properties
     public long size(String path)
             throws FileException
     {
-        return size(getPath(path));
+        Path p = Util.getPath(path);
+        return size(p);
     }
 
     public long size(Path path)
@@ -135,18 +138,6 @@ public class Properties
         catch ( IOException ex ) {
             throw FileException.ioError("Error accessing the size for " + path, ex);
         }
-    }
-
-    /**
-     * TODO: ...
-     * 
-     * @param path
-     * @return 
-     */
-    public static Path getPath(String path)
-    {
-        FileSystem fs = FileSystems.getDefault();
-        return fs.getPath(path);
     }
 
     private static final String TEMP_DIR = System.getProperty("java.io.tmpdir");
