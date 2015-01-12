@@ -20,7 +20,10 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
+import java.util.Comparator;
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.fail;
 
 /**
  * Tools for tests of file-java features.
@@ -107,6 +110,87 @@ public class TestTools
         assertEquals(result, content, msg);
     }
 
+    public static void assertDirEquals(File expected, File actual, String msg)
+            throws IOException
+    {
+        if ( ! expected.isDirectory() ) {
+            fail("expected is not directory: " + expected);
+        }
+        if ( ! actual.isDirectory() ) {
+            fail("actual is not directory: " + actual);
+        }
+        // the children, both sides (sorted)
+        File[] exp_files = expected.listFiles();
+        File[] act_files = actual.listFiles();
+        Arrays.sort(exp_files, FILE_COMPARATOR);
+        Arrays.sort(act_files, FILE_COMPARATOR);
+        // do they have the same length?
+        if ( exp_files.length != act_files.length ) {
+            failDirs(expected, actual, exp_files, act_files,
+                    msg + ": directories do not have the same number of entries: "
+                    + exp_files.length + " versus " + act_files.length);
+        }
+        // loop over all of them
+        for ( int i = 0; i < exp_files.length; ++i ) {
+            File exp = exp_files[i];
+            File act = act_files[i];
+            // do they have the same name? (remember, arrays are sorted by name)
+            if ( ! exp.getName().equals(act.getName()) ) {
+                fail(msg + ": entries #" + i + " do not have the same name: exp=" + exp + ", act= " + act);
+            }
+            // are they equal?
+            if ( exp.isDirectory() ) {
+                if ( act.isDirectory() ) {
+                    assertDirEquals(exp, act, msg);
+                }
+                else {
+                    fail(msg + ": exp is dir (" + exp + "), act is not (" + act + ")");
+                }
+            }
+            else {
+                if ( act.isDirectory() ) {
+                    fail(msg + ": act is dir (" + exp + "), exp is not (" + act + ")");
+                }
+                else {
+                    assertFileEquals(exp, readBinFile(act),
+                            msg + ": binary content of both files, exp=" + exp + ", act=" + act);
+                }
+            }
+        }
+    }
+
+    private static void failDirs(File expected, File actual, File[] exp_files, File[] act_files, String msg)
+    {
+        StringBuilder buf = new StringBuilder(msg);
+        buf.append(": expected (sub)dir: ");
+        buf.append(expected.toString());
+        buf.append(", actual (sub)dir: ");
+        buf.append(actual.toString());
+        buf.append(", expected entries: [");
+        for ( File f : exp_files ) {
+            buf.append("\n");
+            buf.append(f.getName());
+        }
+        buf.append("\n], actual entries: [");
+        for ( File f : act_files ) {
+            buf.append("\n");
+            buf.append(f.getName());
+        }
+        buf.append("\n]");
+        fail(buf.toString());
+    }
+
+    private static class FileComparator
+            implements Comparator<File>
+    {
+        @Override
+        public int compare(File lhs, File rhs)
+        {
+            return lhs.getName().compareTo(rhs.getName());
+        }
+    }
+    private static final Comparator<File> FILE_COMPARATOR = new FileComparator();
+
     // ----------------------------------------------------------------------
     //   Utility functions
     // ----------------------------------------------------------------------
@@ -136,6 +220,7 @@ public class TestTools
         }
     }
 
+    // TODO: Use copyDir from InputOutput...?
     private static void copyDir(File from, File to)
     {
         File[] files = from.listFiles();

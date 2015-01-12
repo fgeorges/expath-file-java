@@ -28,6 +28,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.charset.UnsupportedCharsetException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
 import org.expath.tools.model.Sequence;
 import org.expath.tools.ToolsException;
@@ -139,18 +140,186 @@ public class InputOutput
     //   Miscellaneous functions from spec.
     // ----------------------------------------------------------------------
 
-//    // file:copy($source as xs:string,
-//    //           $target as xs:string) as empty-sequence()
-//    // [file:not-found] is raised if the $source path does not exist.
-//    // [file:exists] is raised if $source points to a directory and $target points to an existing file.
-//    // [file:no-dir] is raised if the parent directory of $source does not exist.
-//    // [file:is-dir] is raised if $source points to a file and $target points to a directory, in which a subdirectory exists with the name of the source file.
-//    // [file:io-error] is raised if any other error occurs.
-//    public void copy()
-//    {
-//        ...
-//    }
-//
+    // file:copy($source as xs:string,
+    //           $target as xs:string) as empty-sequence()
+    // [file:not-found] is raised if the $source path does not exist.
+    // [file:exists] is raised if $source points to a directory and $target points to an existing file.
+    // [file:no-dir] is raised if the parent directory of $source does not exist.
+    // [file:is-dir] is raised if $source points to a file and $target points to a directory, in which a subdirectory exists with the name of the source file.
+    // [file:io-error] is raised if any other error occurs.
+    public void copy(String source, String target)
+            throws FileException
+    {
+        File src = new File(source);
+        File trg = new File(target);
+        if ( ! src.exists() ) {
+            throw FileException.notFound("File not found: " + source);
+        }
+        if ( src.isDirectory() ) {
+            copyDir(src, trg);
+        }
+        else {
+            copyFile(src, trg);
+        }
+    }
+
+    // precond: source exists and is a dir
+    private void copyDir(File source, File target)
+            throws FileException
+    {
+        if ( target.isDirectory() ) {
+            // merge source and target dirs (aka "copy recursively")
+            copyMergeDir(source, target);
+        }
+        else if ( target.exists() ) {
+            throw FileException.exists("Target file already exists and is not a directory: " + target);
+        }
+        else {
+            // create target as dir, and copy all content of source
+            copyNewDir(source, target);
+        }
+    }
+
+    private void copyMergeDir(File source, File target)
+            throws FileException
+    {
+        // source is a directory
+        if ( source.isDirectory() ) {
+            // dir to existing dir
+            if ( target.isDirectory() ) {
+                File[] children = source.listFiles();
+                if ( children == null ) {  // null if security restricted
+                    throw FileException.ioError("Failed to list contents of " + source);
+                }
+                for ( File child : children ) {
+                    File dest = new File(target, child.getName());
+                    copyMergeDir(child, dest);
+                }
+            }
+            // dir to existing file
+            else if ( target.exists() ) {
+                throw FileException.isDir("Source is a directory (" + source
+                        + ") and target a file (" + target + ") in a merge copy");
+            }
+            // dir to new dir
+            else {
+                copyNewDir(source, target);
+            }
+        }
+        // source is a regular file
+        else if ( source.exists() ) {
+            // file to existing dir
+            if ( target.isDirectory() ) {
+                throw FileException.isDir("Source is a file (" + source
+                        + ") and target a directory (" + target + ") in a merge copy");
+            }
+            // file to existing file
+            else if ( target.exists() ) {
+                copyOverwrite(source, target);
+            }
+            // file to new file
+            else {
+                copyCreate(source, target);
+            }
+        }
+        // source does not exist?!?
+        else {
+            throw FileException.ioError("Source does not exist?!?: " + source);
+        }
+    }
+
+    private void copyNewDir(File source, File target)
+            throws FileException
+    {
+        if ( target.exists() ) {
+            throw FileException.ioError("Target '" + target + "' exists");
+        }
+        if ( ! target.mkdirs() ) {
+            throw FileException.ioError("Target '" + target + "' directory cannot be created");
+        }
+        if ( ! target.canWrite() ) {
+            throw FileException.ioError("Target '" + target + "' cannot be written to");
+        }
+        File[] files = source.listFiles();
+        if ( files == null ) {  // null if security restricted
+            throw FileException.ioError("Failed to list contents of " + source);
+        }
+        for ( File file : files ) {
+            File copied = new File(target, file.getName());
+            if ( file.isDirectory() ) {
+                copyDir(file, copied);
+            }
+            else {
+                try {
+                    byte[] buffer = new byte[4096];
+                    InputStream in = new FileInputStream(file);
+                    OutputStream out = new FileOutputStream(copied);
+                    int count;
+                    while ( (count = in.read(buffer)) > 0 ) {
+                        out.write(buffer, 0, count);
+                    }
+                }
+                catch ( IOException ex ) {
+                    throw new RuntimeException("Error copying '" + file + "' to '" + copied + "'", ex);
+                }
+            }
+        }
+    }
+
+    // precond: source exists and is a regular file
+    private void copyFile(File source, File target)
+            throws FileException
+    {
+        if ( target.isDirectory() ) {
+            // create (or overwrite) a file with same name as source in target dir
+            File dest = new File(target, source.getName());
+            if ( dest.isDirectory() ) {
+                throw FileException.isDir("The target dir has a subdir with the name of the source file: " + dest);
+            }
+            else if ( dest.exists() ) {
+                // overwrite target
+                copyOverwrite(source, dest);
+            }
+            else {
+                // create target
+                copyCreate(source, dest);
+            }
+        }
+        else if ( target.exists() ) {
+            // overwrite target
+            copyOverwrite(source, target);
+        }
+        else {
+            // create target
+            copyCreate(source, target);
+        }
+    }
+
+    // precond: both source and target exist and are regular files
+    private void copyOverwrite(File source, File target)
+            throws FileException
+    {
+        try {
+            Files.copy(source.toPath(), target.toPath(), StandardCopyOption.REPLACE_EXISTING);
+        }
+        catch ( IOException ex ) {
+            throw FileException.ioError("Error overwriting " + target + " by " + source, ex);
+        }
+    }
+
+    // precond: source exists and is a regular file
+    //          target does not exist, its parent does and is a dir
+    private void copyCreate(File source, File target)
+            throws FileException
+    {
+        try {
+            Files.copy(source.toPath(), target.toPath());
+        }
+        catch ( IOException ex ) {
+            throw FileException.ioError("Error copying " + source + " to " + target, ex);
+        }
+    }
+
 //    // file:create-dir($dir as xs:string) as empty-sequence()
 //    // [file:exists] is raised if the specified path, or any of its parent directories, points to an existing file.
 //    // [file:io-error] is raised if any other error occurs.
