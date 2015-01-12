@@ -39,7 +39,7 @@ public class WriteTest
         Element elem = DomElement.parseString(xml);
         Sequence seq = elem.getContent();
         String file = WRITE_01.getAbsolutePath();
-        InputOutput sut = new InputOutput();
+        Write sut = new Write();
         sut.write(file, seq);
         assertFileEquals(WRITE_01, "First line.\n",
                 "The content of the text file after write");
@@ -53,7 +53,7 @@ public class WriteTest
         Element elem = DomElement.parseString(xml);
         Sequence seq = elem.getContent();
         String file = WRITE_02.getAbsolutePath();
-        InputOutput sut = new InputOutput();
+        Write sut = new Write();
         sut.write(file, seq);
         assertFileEquals(WRITE_02, "First line.\n",
                 "The content of the text file after write");
@@ -65,7 +65,7 @@ public class WriteTest
     {
         byte[] bytes = { 0b100, 0b101, 0b110, 0b111 };
         String file = WRITE_03.getAbsolutePath();
-        InputOutput sut = new InputOutput();
+        Write sut = new Write();
         sut.writeBinary(file, bytes);
         byte[] expect = { 0b100, 0b101, 0b110, 0b111 };
         assertFileEquals(WRITE_03, expect,
@@ -79,7 +79,7 @@ public class WriteTest
     {
         String str = "First line.\n";
         String file = WRITE_04.getAbsolutePath();
-        InputOutput sut = new InputOutput();
+        Write sut = new Write();
         sut.writeText(file, str);
         assertFileEquals(WRITE_04, "First line.\n",
                 "The content of the text file after writing text");
@@ -94,7 +94,7 @@ public class WriteTest
         lines.add("Second line.");
         lines.add("Third line.");
         String file = WRITE_05.getAbsolutePath();
-        InputOutput sut = new InputOutput();
+        Write sut = new Write();
         sut.writeTextLines(file, lines);
         assertFileEquals(WRITE_05, "First line.\nSecond line.\nThird line.\n",
                 "The content of the text file after writing text lines");

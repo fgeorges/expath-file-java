@@ -32,7 +32,7 @@ public class ReadTest
             throws Exception
     {
         String file = READ_01.getAbsolutePath();
-        InputOutput sut = new InputOutput();
+        Read sut = new Read();
         byte[] result = sut.readBinary(file);
         byte[] expect = { 0b0, 0b1, 0b10, 0b11, 0b100, 0b101, 0b110, 0b111 };
         assertEquals(result, expect, "Reading the binary file");
@@ -43,7 +43,7 @@ public class ReadTest
             throws Exception
     {
         String file = READ_01.getAbsolutePath();
-        InputOutput sut = new InputOutput();
+        Read sut = new Read();
         byte[] result = sut.readBinary(file, 4);
         byte[] expect = { 0b100, 0b101, 0b110, 0b111 };
         assertEquals(result, expect, "Reading the binary file with an offset");
@@ -54,7 +54,7 @@ public class ReadTest
             throws Exception
     {
         String file = READ_01.getAbsolutePath();
-        InputOutput sut = new InputOutput();
+        Read sut = new Read();
         byte[] result = sut.readBinary(file, 2, 4);
         byte[] expect = { 0b10, 0b11, 0b100, 0b101 };
         assertEquals(result, expect,
@@ -67,7 +67,7 @@ public class ReadTest
             throws Exception
     {
         String file = READ_02.getAbsolutePath();
-        InputOutput sut = new InputOutput();
+        Read sut = new Read();
         String result = sut.readText(file);
         assertEquals(result, "First line.\n",
                 "The content of the text file after writing text");
@@ -79,7 +79,7 @@ public class ReadTest
             throws Exception
     {
         String file = READ_03.getAbsolutePath();
-        InputOutput sut = new InputOutput();
+        Read sut = new Read();
         List<String> result = sut.readTextLines(file);
         List<String> expected = new ArrayList<>();
         expected.add("First line.");

@@ -39,7 +39,7 @@ public class AppendTest
         Element elem = DomElement.parseString(xml);
         Sequence seq = elem.getContent();
         String file = APPEND_01.getAbsolutePath();
-        InputOutput sut = new InputOutput();
+        Write sut = new Write();
         sut.append(file, seq);
         assertFileEquals(APPEND_01, "First line.\nSecond line.\n",
                 "The content of the text file after append");
@@ -51,7 +51,7 @@ public class AppendTest
     {
         byte[] bytes = { 0b100, 0b101, 0b110, 0b111 };
         String file = APPEND_02.getAbsolutePath();
-        InputOutput sut = new InputOutput();
+        Write sut = new Write();
         sut.appendBinary(file, bytes);
         byte[] expect = { 0b0, 0b1, 0b10, 0b11, 0b100, 0b101, 0b110, 0b111 };
         assertFileEquals(APPEND_02, expect, "The content of the binary file after append");
@@ -64,7 +64,7 @@ public class AppendTest
     {
         String str = "Second line.\n";
         String file = APPEND_03.getAbsolutePath();
-        InputOutput sut = new InputOutput();
+        Write sut = new Write();
         sut.appendText(file, str);
         assertFileEquals(APPEND_03, "First line.\nSecond line.\n",
                 "The content of the text file after appending text");
@@ -78,7 +78,7 @@ public class AppendTest
         lines.add("Second line.");
         lines.add("Third line.");
         String file = APPEND_04.getAbsolutePath();
-        InputOutput sut = new InputOutput();
+        Write sut = new Write();
         sut.appendTextLines(file, lines);
         assertFileEquals(APPEND_04, "First line.\nSecond line.\nThird line.\n",
                 "The content of the text file after appending text lines");
