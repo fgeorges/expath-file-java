@@ -233,30 +233,84 @@ public class InputOutput
         }
     }
 
-//    // file:create-temp-dir($prefix as xs:string,
-//    //                      $suffix as xs:string) as xs:string
-//    // file:create-temp-dir($prefix as xs:string,
-//    //                      $suffix as xs:string,
-//    //                      $dir as xs:string) as xs:string
-//    // [file:no-dir] is raised if the specified directory does not exist or points to a file.
-//    // [file:io-error] is raised if any other error occurs.
-//    public void createTempDir()
-//    {
-//        ...
-//    }
-//
-//    // file:create-temp-file($prefix as xs:string,
-//    //                       $suffix as xs:string) as xs:string
-//    // file:create-temp-file($prefix as xs:string,
-//    //                       $suffix as xs:string,
-//    //                       $dir as xs:string) as xs:string
-//    // [file:no-dir] is raised if the specified directory does not exist or points to a file.
-//    // [file:io-error] is raised if any other error occurs.
-//    public void createTempFile()
-//    {
-//        ...
-//    }
-//
+    // file:create-temp-dir($prefix as xs:string,
+    //                      $suffix as xs:string) as xs:string
+    // file:create-temp-dir($prefix as xs:string,
+    //                      $suffix as xs:string,
+    //                      $dir as xs:string) as xs:string
+    // [file:no-dir] is raised if the specified directory does not exist or points to a file.
+    // [file:io-error] is raised if any other error occurs.
+    public File createTempDir(String prefix, String suffix)
+            throws FileException
+    {
+        try {
+            File f = File.createTempFile(prefix, suffix);
+            return turnIntoDir(f);
+        }
+        catch ( IOException ex ) {
+            throw FileException.ioError("Error creating the temporary directory", ex);
+        }
+    }
+
+    public File createTempDir(String prefix, String suffix, String dir)
+            throws FileException
+    {
+        try {
+            File d = new File(dir);
+            if ( d.isDirectory() ) {
+                File f = File.createTempFile(prefix, suffix, d);
+                return turnIntoDir(f);
+            }
+            else if ( d.exists() ) {
+                throw FileException.noDir("The directory where to create a temp dir is not a dir: " + d);
+            }
+            else {
+                throw FileException.noDir("The directory where to create a temp dir does not exist: " + d);
+            }
+        }
+        catch ( IOException ex ) {
+            throw FileException.ioError("Error creating the temporary directory", ex);
+        }
+    }
+
+    // file:create-temp-file($prefix as xs:string,
+    //                       $suffix as xs:string) as xs:string
+    // file:create-temp-file($prefix as xs:string,
+    //                       $suffix as xs:string,
+    //                       $dir as xs:string) as xs:string
+    // [file:no-dir] is raised if the specified directory does not exist or points to a file.
+    // [file:io-error] is raised if any other error occurs.
+    public File createTempFile(String prefix, String suffix)
+            throws FileException
+    {
+        try {
+            return File.createTempFile(prefix, suffix);
+        }
+        catch ( IOException ex ) {
+            throw FileException.ioError("Error creating the temporary file", ex);
+        }
+    }
+
+    public File createTempFile(String prefix, String suffix, String dir)
+            throws FileException
+    {
+        try {
+            File d = new File(dir);
+            if ( d.isDirectory() ) {
+                return File.createTempFile(prefix, suffix, d);
+            }
+            else if ( d.exists() ) {
+                throw FileException.noDir("The directory where to create a temp file is not a dir: " + d);
+            }
+            else {
+                throw FileException.noDir("The directory where to create a temp file does not exist: " + d);
+            }
+        }
+        catch ( IOException ex ) {
+            throw FileException.ioError("Error creating the temporary file", ex);
+        }
+    }
+
 //    // file:delete($path as xs:string) as empty-sequence()
 //    // file:delete($path as xs:string,
 //    //             $recursive as xs:boolean) as empty-sequence()
@@ -292,6 +346,18 @@ public class InputOutput
 //    {
 //        ...
 //    }
+
+    private File turnIntoDir(File f)
+            throws FileException
+    {
+        if ( ! f.delete() ) {
+            throw FileException.ioError("Error deleting the temp file to create a dir file");
+        }
+        if ( ! f.mkdir() ) {
+            throw FileException.ioError("Error creating the temp dir from the temp file");
+        }
+        return f;
+    }
 }
 
 

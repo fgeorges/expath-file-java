@@ -11,6 +11,8 @@
 package org.expath.file;
 
 import java.io.File;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
 import org.testng.annotations.BeforeClass;
@@ -69,6 +71,70 @@ public class DirectoryTest
                 fail("Wrong exception thrown (must be EXISTS): " + ex.getType(), ex);
             }
         }
+    }
+
+    @Test
+    public void createTempDir_default()
+            throws Exception
+    {
+        InputOutput sut = new InputOutput();
+        File result = sut.createTempDir("prefix-", "-suffix");
+        // just because it's created outside of this test area...
+        System.out.println("Temp dir: " + result);
+        assertTrue(result.exists(), "Temp dir must exist: " + result);
+        assertTrue(result.isDirectory(), "Temp dir must be a directory: " + result);
+        assertTrue(result.getName().startsWith("prefix-"),
+                "Temp dir name must start with 'prefix-': " + result);
+        assertTrue(result.getName().endsWith("-suffix"),
+                "Temp dir name must end with '-suffix': " + result);
+    }
+
+    @Test
+    public void createTempDir_inDir()
+            throws Exception
+    {
+        InputOutput sut = new InputOutput();
+        File result = sut.createTempDir("prefix-", "-suffix", CREATE_DIR.getAbsolutePath());
+        assertTrue(result.exists(), "Temp dir must exist: " + result);
+        assertTrue(result.isDirectory(), "Temp dir must be a directory: " + result);
+        assertTrue(result.getName().startsWith("prefix-"),
+                "Temp dir name must start with 'prefix-': " + result);
+        assertTrue(result.getName().endsWith("-suffix"),
+                "Temp dir name must end with '-suffix': " + result);
+        assertEquals(result.getParentFile(), CREATE_DIR,
+                "Temp dir parent must be CREATE_DIR: " + result.getParent());
+    }
+
+    @Test
+    public void createTempFile_default()
+            throws Exception
+    {
+        InputOutput sut = new InputOutput();
+        File result = sut.createTempFile("prefix-", "-suffix");
+        // just because it's created outside of this test area...
+        System.out.println("Temp file: " + result);
+        assertTrue(result.exists(), "Temp file must exist: " + result);
+        assertFalse(result.isDirectory(), "Temp file must not be a directory: " + result);
+        assertTrue(result.getName().startsWith("prefix-"),
+                "Temp file name must start with 'prefix-': " + result);
+        assertTrue(result.getName().endsWith("-suffix"),
+                "Temp file name must end with '-suffix': " + result);
+    }
+
+    @Test
+    public void createTempFile_inDir()
+            throws Exception
+    {
+        InputOutput sut = new InputOutput();
+        File result = sut.createTempFile("prefix-", "-suffix", CREATE_DIR.getAbsolutePath());
+        assertTrue(result.exists(), "Temp file must exist: " + result);
+        assertFalse(result.isDirectory(), "Temp file must not be a directory: " + result);
+        assertTrue(result.getName().startsWith("prefix-"),
+                "Temp file name must start with 'prefix-': " + result);
+        assertTrue(result.getName().endsWith("-suffix"),
+                "Temp file name must end with '-suffix': " + result);
+        assertEquals(result.getParentFile(), CREATE_DIR,
+                "Temp file parent must be CREATE_DIR: " + result.getParent());
     }
 
     // ----------------------------------------------------------------------
