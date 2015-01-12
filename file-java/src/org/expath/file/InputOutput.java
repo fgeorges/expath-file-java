@@ -212,14 +212,27 @@ public class InputOutput
         }
     }
 
-//    // file:create-dir($dir as xs:string) as empty-sequence()
-//    // [file:exists] is raised if the specified path, or any of its parent directories, points to an existing file.
-//    // [file:io-error] is raised if any other error occurs.
-//    public void createDir()
-//    {
-//        ...
-//    }
-//
+    // file:create-dir($dir as xs:string) as empty-sequence()
+    // [file:exists] is raised if the specified path, or any of its parent directories, points to an existing file.
+    // [file:io-error] is raised if any other error occurs.
+    public void createDir(String dir)
+            throws FileException
+    {
+        File f = new File(dir);
+        if ( f.isDirectory() ) {
+            // nothing, already exists
+        }
+        else if ( f.exists() ) {
+            // exists, not a dir
+            throw FileException.exists("Already exists as a file: " + f);
+        }
+        else {
+            if ( ! f.mkdirs() ) {
+                throw FileException.ioError("Error creating the directory: " + f);
+            }
+        }
+    }
+
 //    // file:create-temp-dir($prefix as xs:string,
 //    //                      $suffix as xs:string) as xs:string
 //    // file:create-temp-dir($prefix as xs:string,
