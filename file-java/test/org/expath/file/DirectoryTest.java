@@ -168,7 +168,7 @@ public class DirectoryTest
     public void delete_emptyDir()
             throws Exception
     {
-        File dir = new File(DELETE, "empty-dir");
+        File dir = DELETE_EMPTY;
         assertTrue(dir.exists(), "Dir must exist before delete: " + dir);
         InputOutput sut = new InputOutput();
         sut.delete(dir.getAbsolutePath());
@@ -213,14 +213,20 @@ public class DirectoryTest
     public static void setUpClass()
             throws Exception
     {
-        DIR        = TestTools.initArea("directory");
-        CREATE_DIR = new File(DIR, "create-dir");
-        DELETE     = new File(DIR, "delete");
+        DIR          = TestTools.initArea("directory");
+        CREATE_DIR   = new File(DIR, "create-dir");
+        DELETE       = new File(DIR, "delete");
+        DELETE_EMPTY = new File(DELETE, "empty-dir");
+        // because git does not allow to commit an empty directory
+        if ( ! DELETE_EMPTY.exists() ) {
+            DELETE_EMPTY.mkdir();
+        }
     }
 
-    private static File DIR        = null;
-    private static File CREATE_DIR = null;
-    private static File DELETE     = null;
+    private static File DIR          = null;
+    private static File CREATE_DIR   = null;
+    private static File DELETE       = null;
+    private static File DELETE_EMPTY = null;
 }
 
 
