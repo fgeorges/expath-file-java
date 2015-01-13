@@ -11,6 +11,9 @@
 package org.expath.file;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
@@ -205,6 +208,120 @@ public class DirectoryTest
         assertFalse(dir.exists(), "Dir must not exist after delete: " + dir);
     }
 
+    @Test
+    public void list_notExists()
+            throws Exception
+    {
+        File file = new File(LIST, "does-not-exist");
+        InputOutput sut = new InputOutput();
+        try {
+            sut.list(file.getAbsolutePath());
+        }
+        catch ( FileException ex ) {
+            if ( ex.getType() != FileException.Type.NO_DIR ) {
+                fail("Wrong exception thrown (must be NO_DIR): " + ex.getType(), ex);
+            }
+        }
+    }
+
+    @Test
+    public void list_file()
+            throws Exception
+    {
+        File file = new File(LIST, "file.txt");
+        InputOutput sut = new InputOutput();
+        try {
+            sut.list(file.getAbsolutePath());
+        }
+        catch ( FileException ex ) {
+            if ( ex.getType() != FileException.Type.NO_DIR ) {
+                fail("Wrong exception thrown (must be NO_DIR): " + ex.getType(), ex);
+            }
+        }
+    }
+
+    @Test
+    public void list_empty()
+            throws Exception
+    {
+        File dir = LIST_EMPTY;
+        InputOutput sut = new InputOutput();
+        List<String> result = sut.list(dir.getAbsolutePath());
+        Collections.sort(result);
+        List<String> expected = new ArrayList<>();
+        assertEquals(result, expected, "Files listed are wrong: " + dir);
+    }
+
+    @Test
+    public void list_nonEmpty()
+            throws Exception
+    {
+        File dir = new File(LIST, "non-empty-dir");
+        InputOutput sut = new InputOutput();
+        List<String> result = sut.list(dir.getAbsolutePath());
+        Collections.sort(result);
+        List<String> expected = new ArrayList<>();
+        expected.add("file.txt");
+        assertEquals(result, expected, "Files listed are wrong: " + dir);
+    }
+
+    @Test
+    public void list_nonRecursive()
+            throws Exception
+    {
+        File dir = new File(LIST, "dir");
+        InputOutput sut = new InputOutput();
+        List<String> result = sut.list(dir.getAbsolutePath());
+        Collections.sort(result);
+        List<String> expected = new ArrayList<>();
+        expected.add("file.txt");
+        expected.add("subdir");
+        assertEquals(result, expected, "Files listed are wrong: " + dir);
+    }
+
+    @Test
+    public void list_nonRecursive_2()
+            throws Exception
+    {
+        File dir = new File(LIST, "dir");
+        InputOutput sut = new InputOutput();
+        List<String> result = sut.list(dir.getAbsolutePath(), false);
+        Collections.sort(result);
+        List<String> expected = new ArrayList<>();
+        expected.add("file.txt");
+        expected.add("subdir");
+        assertEquals(result, expected, "Files listed are wrong: " + dir);
+    }
+
+    @Test
+    public void list_recursive()
+            throws Exception
+    {
+        File dir = new File(LIST, "dir");
+        InputOutput sut = new InputOutput();
+        List<String> result = sut.list(dir.getAbsolutePath(), true);
+        Collections.sort(result);
+        List<String> expected = new ArrayList<>();
+        expected.add("file.txt");
+        expected.add("subdir");
+        expected.add("subdir/file.txt");
+        assertEquals(result, expected, "Files listed are wrong: " + dir);
+    }
+
+    @Test
+    public void list_pattern()
+            throws Exception
+    {
+        File dir = new File(LIST, "dir");
+        InputOutput sut = new InputOutput();
+        List<String> result = sut.list(dir.getAbsolutePath(), true, "*.txt");
+        Collections.sort(result);
+        List<String> expected = new ArrayList<>();
+        expected.add("file.txt");
+        expected.add("subdir/file.txt");
+        assertEquals(result, expected, "Files listed are wrong: " + dir);
+    }
+
     // ----------------------------------------------------------------------
     //   Test setup
     // ----------------------------------------------------------------------
@@ -221,12 +338,20 @@ public class DirectoryTest
         if ( ! DELETE_EMPTY.exists() ) {
             DELETE_EMPTY.mkdir();
         }
+        LIST         = new File(DIR, "list");
+        LIST_EMPTY   = new File(LIST, "empty-dir");
+        // because git does not allow to commit an empty directory
+        if ( ! LIST_EMPTY.exists() ) {
+            LIST_EMPTY.mkdir();
+        }
     }
 
     private static File DIR          = null;
     private static File CREATE_DIR   = null;
     private static File DELETE       = null;
     private static File DELETE_EMPTY = null;
+    private static File LIST         = null;
+    private static File LIST_EMPTY   = null;
 }
 
 

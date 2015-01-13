@@ -13,11 +13,16 @@ package org.expath.file;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.regex.Pattern;
 
 /**
  * Facade for EXPath File module functions in section "Input/Output".
@@ -382,19 +387,106 @@ public class InputOutput
         safeDelete(f);
     }
 
-//    // file:list($dir as xs:string) as xs:string*
-//    // file:list($dir as xs:string,
-//    //           $recursive as xs:boolean) as xs:string*
-//    // file:list($dir as xs:string,
-//    //           $recursive as xs:boolean,
-//    //           $pattern as xs:string) as xs:string*
-//    // [file:no-dir] is raised $dir does not point to an existing directory.
-//    // [file:io-error] is raised if any other error occurs.
-//    public void list()
-//    {
-//        ...
-//    }
-//
+    // file:list($dir as xs:string) as xs:string*
+    // file:list($dir as xs:string,
+    //           $recursive as xs:boolean) as xs:string*
+    // file:list($dir as xs:string,
+    //           $recursive as xs:boolean,
+    //           $pattern as xs:string) as xs:string*
+    // [file:no-dir] is raised $dir does not point to an existing directory.
+    // [file:io-error] is raised if any other error occurs.
+    public List<String> list(String dir)
+            throws FileException
+    {
+        return list(dir, false);
+    }
+
+    public List<String> list(String dir, boolean recursive)
+            throws FileException
+    {
+        return list(dir, recursive, null);
+    }
+
+    public List<String> list(String dir, boolean recursive, String pattern)
+            throws FileException
+    {
+        File d = new File(dir);
+        if ( ! d.isDirectory() ) {
+            throw FileException.noDir("Not a directory: " + d);
+        }
+        FilenameFilter filter = pattern == null ? null : new ListFilter(pattern);
+        if ( recursive ) {
+            List<String> list = new ArrayList<>();
+            listRecurse(d, "", list, filter);
+            return list;
+        }
+        else {
+            String[] list = d.list(filter);
+            return Arrays.asList(list);
+        }
+    }
+
+    private void listRecurse(File dir, String prefix, List<String> list, FilenameFilter filter)
+    {
+        for ( File f : dir.listFiles() ) {
+            String name = f.getName();
+            if ( filter == null || filter.accept(dir, name) ) {
+                list.add(prefix + name);
+            }
+            if ( f.isDirectory() ) {
+                listRecurse(f, prefix + name + "/" , list, filter);
+            }
+        }
+    }
+
+    private static class ListFilter
+            implements FilenameFilter
+    {
+        public ListFilter(String pattern)
+        {
+            StringBuilder buf = new StringBuilder("^");
+            for ( char c : pattern.toCharArray() ) {
+                switch ( c ) {
+                    case '*':
+                        buf.append(".*");
+                        break;
+                    case '?':
+                        buf.append('.');
+                        break;
+                    case '\\':
+                        buf.append("\\\\");
+                        break;
+                    case '{':
+                    case '}':
+                    case '.':
+                    case '(':
+                    case ')':
+                    case '+':
+                    case '|':
+                    case '^':
+                    case '$':
+                    case '@':
+                    case '%':
+                        buf.append('\\');
+                        buf.append(c);
+                        break;
+                    default:
+                        buf.append(c);
+                }
+            }
+            buf.append("$");
+            myPattern = Pattern.compile(buf.toString());
+        }
+
+        @Override
+        public boolean accept(File dir, String name)
+        {
+            return myPattern.matcher(name).matches();
+        }
+
+        private final Pattern myPattern;
+    }
+
 //    // file:move($source as xs:string,
 //    //           $target as xs:string) as empty-sequence()
 //    // [file:not-found] is raised if the $source path does not exist.
