@@ -273,6 +273,18 @@ public class InputOutput
         }
     }
 
+    private File turnIntoDir(File f)
+            throws FileException
+    {
+        if ( ! f.delete() ) {
+            throw FileException.ioError("Error deleting the temp file to create a dir file");
+        }
+        if ( ! f.mkdir() ) {
+            throw FileException.ioError("Error creating the temp dir from the temp file");
+        }
+        return f;
+    }
+
     // file:create-temp-file($prefix as xs:string,
     //                       $suffix as xs:string) as xs:string
     // file:create-temp-file($prefix as xs:string,
@@ -311,17 +323,65 @@ public class InputOutput
         }
     }
 
-//    // file:delete($path as xs:string) as empty-sequence()
-//    // file:delete($path as xs:string,
-//    //             $recursive as xs:boolean) as empty-sequence()
-//    // [file:not-found] is raised if $path does not exist.
-//    // [file:is-dir] is raised if $file points to a non-empty directory.
-//    // [file:io-error] is raised if any other error occurs.
-//    public void delete()
-//    {
-//        ...
-//    }
-//
+    // file:delete($path as xs:string) as empty-sequence()
+    // file:delete($path as xs:string,
+    //             $recursive as xs:boolean) as empty-sequence()
+    // [file:not-found] is raised if $path does not exist.
+    // [file:is-dir] is raised if $file points to a non-empty directory.
+    // [file:io-error] is raised if any other error occurs.
+    public void delete(String path)
+            throws FileException
+    {
+        delete(path, false);
+    }
+
+    public void delete(String path, boolean recursive)
+            throws FileException
+    {
+        File f = new File(path);
+        if ( f.isDirectory() ) {
+            if ( f.list().length > 0 ) {
+                // non-empty dir
+                if ( recursive ) {
+                    deleteDir(f);
+                }
+                else {
+                    throw FileException.isDir("Directory to delete is not empty: " + f);
+                }
+            }
+            else {
+                // empty dir
+                safeDelete(f);
+            }
+        }
+        else if ( f.exists() ) {
+            // regular file
+            safeDelete(f);
+        }
+        else {
+            throw FileException.notFound("File does not exist: " + f);
+        }
+    }
+
+    private void safeDelete(File f)
+            throws FileException
+    {
+        if ( ! f.delete() ) {
+            throw FileException.isDir("Error deleting file: " + f);
+        }
+    }
+
+    private void deleteDir(File f)
+            throws FileException
+    {
+        if ( f.isDirectory() ) {
+            for ( File child : f.listFiles() ) {
+                deleteDir(child);
+            }
+        }
+        safeDelete(f);
+    }
+
 //    // file:list($dir as xs:string) as xs:string*
 //    // file:list($dir as xs:string,
 //    //           $recursive as xs:boolean) as xs:string*
@@ -346,18 +406,6 @@ public class InputOutput
 //    {
 //        ...
 //    }
-
-    private File turnIntoDir(File f)
-            throws FileException
-    {
-        if ( ! f.delete() ) {
-            throw FileException.ioError("Error deleting the temp file to create a dir file");
-        }
-        if ( ! f.mkdir() ) {
-            throw FileException.ioError("Error creating the temp dir from the temp file");
-        }
-        return f;
-    }
 }
 
 

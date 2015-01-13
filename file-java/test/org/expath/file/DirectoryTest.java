@@ -137,6 +137,74 @@ public class DirectoryTest
                 "Temp file parent must be CREATE_DIR: " + result.getParent());
     }
 
+    @Test
+    public void delete_notExists()
+            throws Exception
+    {
+        File file = new File(DELETE, "does-not-exist");
+        InputOutput sut = new InputOutput();
+        try {
+            sut.delete(file.getAbsolutePath());
+        }
+        catch ( FileException ex ) {
+            if ( ex.getType() != FileException.Type.NOT_FOUND ) {
+                fail("Wrong exception thrown (must be NOT_FOUND): " + ex.getType(), ex);
+            }
+        }
+    }
+
+    @Test
+    public void delete_file()
+            throws Exception
+    {
+        File file = new File(DELETE, "file.txt");
+        assertTrue(file.exists(), "File must exist before delete: " + file);
+        InputOutput sut = new InputOutput();
+        sut.delete(file.getAbsolutePath());
+        assertFalse(file.exists(), "File must not exist after delete: " + file);
+    }
+
+    @Test
+    public void delete_emptyDir()
+            throws Exception
+    {
+        File dir = new File(DELETE, "empty-dir");
+        assertTrue(dir.exists(), "Dir must exist before delete: " + dir);
+        InputOutput sut = new InputOutput();
+        sut.delete(dir.getAbsolutePath());
+        assertFalse(dir.exists(), "Dir must not exist after delete: " + dir);
+    }
+
+    @Test
+    public void delete_notEmptyDir()
+            throws Exception
+    {
+        File dir = new File(DELETE, "non-empty-dir");
+        InputOutput sut = new InputOutput();
+        try {
+            sut.delete(dir.getAbsolutePath());
+        }
+        catch ( FileException ex ) {
+            if ( ex.getType() != FileException.Type.IS_DIR ) {
+                fail("Wrong exception thrown (must be IS_DIR): " + ex.getType(), ex);
+            }
+            assertTrue(dir.exists(), "Dir must still exist after delete: " + dir);
+            File child = new File(dir, "file.txt");
+            assertTrue(child.exists(), "Child must still exist after delete: " + child);
+        }
+    }
+
+    @Test
+    public void delete_dir()
+            throws Exception
+    {
+        File dir = new File(DELETE, "dir");
+        assertTrue(dir.exists(), "Dir must exist before delete: " + dir);
+        InputOutput sut = new InputOutput();
+        sut.delete(dir.getAbsolutePath(), true);
+        assertFalse(dir.exists(), "Dir must not exist after delete: " + dir);
+    }
+
     // ----------------------------------------------------------------------
     //   Test setup
     // ----------------------------------------------------------------------
@@ -147,10 +215,12 @@ public class DirectoryTest
     {
         DIR        = TestTools.initArea("directory");
         CREATE_DIR = new File(DIR, "create-dir");
+        DELETE     = new File(DIR, "delete");
     }
 
     private static File DIR        = null;
     private static File CREATE_DIR = null;
+    private static File DELETE     = null;
 }
 
 

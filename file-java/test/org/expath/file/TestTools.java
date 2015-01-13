@@ -205,6 +205,7 @@ public class TestTools
         }
     }
 
+    // TODO: Use delete from InputOutput...?
     private static boolean deleteDir(File f)
     {
         if ( f.isDirectory() ) {
