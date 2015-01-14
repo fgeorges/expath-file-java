@@ -19,7 +19,7 @@ import java.nio.file.attribute.FileTime;
 import java.util.Date;
 
 /**
- * Facade for EXPath File module function in sections "File Properties" and "System Properties".
+ * Facade for EXPath File module functions in sections "File Properties" and "System Properties".
  * 
  * @author Florent Georges
  * @date   2015-01-07

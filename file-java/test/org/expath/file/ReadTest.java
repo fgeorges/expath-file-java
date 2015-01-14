@@ -18,7 +18,7 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 /**
- * Test for the `read*` functions in {@link InputOutput}.
+ * Test for the `read*` functions in {@link Read}.
  * 
  * @author Florent Georges
  * @date   2015-01-11

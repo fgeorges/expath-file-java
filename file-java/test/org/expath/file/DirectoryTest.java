@@ -22,7 +22,7 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 /**
- * Test functions related to directory entries.
+ * Test directory entries functions in {@link InputOutput}.
  * 
  * - file:create-dir
  * - file:create-temp-dir

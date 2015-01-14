@@ -21,7 +21,7 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 /**
- * Test for the `append*` functions in {@link InputOutput}.
+ * Test for the `append*` functions in {@link Write}.
  * 
  * @author Florent Georges
  * @date   2015-01-09
