@@ -487,17 +487,85 @@ public class InputOutput
         private final Pattern myPattern;
     }
 
-//    // file:move($source as xs:string,
-//    //           $target as xs:string) as empty-sequence()
-//    // [file:not-found] is raised if the $source path does not exist.
-//    // [file:exists] is raised if $source points to a directory and $target points to an existing file.
-//    // [file:no-dir] is raised if the parent directory of $source does not exist.
-//    // [file:is-dir] is raised if $target points to a directory, in which a subdirectory exists with the name of the source.
-//    // [file:io-error] is raised if any other error occurs.
-//    public void move()
-//    {
-//        ...
-//    }
+    // file:move($source as xs:string,
+    //           $target as xs:string) as empty-sequence()
+    // [file:not-found] is raised if the $source path does not exist.
+    // [file:exists] is raised if $source points to a directory and $target points to an existing file.
+    // [file:no-dir] is raised if the parent directory of $source does not exist.
+    // [file:is-dir] is raised if $target points to a directory, in which a subdirectory exists with the name of the source.
+    // [file:io-error] is raised if any other error occurs.
+    public void move(String source, String target)
+            throws FileException
+    {
+        File src = new File(source);
+        File trg = new File(target);
+        // does source exist?
+        if ( ! src.exists() ) {
+            if ( ! src.getParentFile().exists() ) {
+                throw FileException.noDir("Parent dir of source does not exist: " + source);
+            }
+            else {
+                throw FileException.notFound("File not found: " + source);
+            }
+        }
+        // do it!
+        if ( src.isDirectory() ) {
+            moveDir(src, trg);
+        }
+        else {
+            moveFile(src, trg);
+        }
+    }
+
+    // precond: source exists and is a dir
+    private void moveDir(File source, File target)
+            throws FileException
+    {
+        if ( target.isDirectory() ) {
+            File dest = new File(target, source.getName());
+            if ( dest.isDirectory() ) {
+                throw FileException.isDir("Target dir contains already a subdir with the same name: " + dest);
+            }
+            else if ( dest.exists()) {
+                throw FileException.isDir("Target dir contains already a file with the same name: " + dest);
+            }
+            else {
+                safeMove(source, target);
+            }
+        }
+        else if ( target.exists() ) {
+            throw FileException.exists("Target file already exists and is not a directory: " + target);
+        }
+        else {
+            safeMove(source, target);
+        }
+    }
+
+    // precond: source exists and is a regular file
+    private void moveFile(File source, File target)
+            throws FileException
+    {
+        if ( target.isDirectory() ) {
+            File dest = new File(target, source.getName());
+            if ( dest.isDirectory() ) {
+                throw FileException.isDir("The target dir has a subdir with the name of the source file: " + dest);
+            }
+            else {
+                safeMove(source, dest);
+            }
+        }
+        else {
+            safeMove(source, target);
+        }
+    }
+
+    private void safeMove(File from, File to)
+            throws FileException
+    {
+        if ( ! from.renameTo(to) ) {
+            throw FileException.isDir("Error renaming file: " + from + " -> " + to);
+        }
+    }
 }
 
 

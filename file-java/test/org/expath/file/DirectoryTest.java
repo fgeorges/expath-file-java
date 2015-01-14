@@ -68,6 +68,7 @@ public class DirectoryTest
         InputOutput sut = new InputOutput();
         try {
             sut.createDir(dir.getAbsolutePath());
+            fail("Must throw an EXISTS exception");
         }
         catch ( FileException ex ) {
             if ( ex.getType() != FileException.Type.EXISTS ) {
@@ -148,6 +149,7 @@ public class DirectoryTest
         InputOutput sut = new InputOutput();
         try {
             sut.delete(file.getAbsolutePath());
+            fail("Must throw a NOT_FOUND exception");
         }
         catch ( FileException ex ) {
             if ( ex.getType() != FileException.Type.NOT_FOUND ) {
@@ -186,6 +188,7 @@ public class DirectoryTest
         InputOutput sut = new InputOutput();
         try {
             sut.delete(dir.getAbsolutePath());
+            fail("Must throw an IS_DIR exception");
         }
         catch ( FileException ex ) {
             if ( ex.getType() != FileException.Type.IS_DIR ) {
@@ -216,6 +219,7 @@ public class DirectoryTest
         InputOutput sut = new InputOutput();
         try {
             sut.list(file.getAbsolutePath());
+            fail("Must throw a NO_DIR exception");
         }
         catch ( FileException ex ) {
             if ( ex.getType() != FileException.Type.NO_DIR ) {
@@ -232,6 +236,7 @@ public class DirectoryTest
         InputOutput sut = new InputOutput();
         try {
             sut.list(file.getAbsolutePath());
+            fail("Must throw a NO_DIR exception");
         }
         catch ( FileException ex ) {
             if ( ex.getType() != FileException.Type.NO_DIR ) {
@@ -322,6 +327,94 @@ public class DirectoryTest
         assertEquals(result, expected, "Files listed are wrong: " + dir);
     }
 
+    @Test
+    public void move_noSource()
+            throws Exception
+    {
+        File source = new File(LIST, "does-not-exist");
+        File target = new File(LIST, "doesnt-exists-either");
+        assertFalse(source.exists(), "File must not exist: " + source);
+        assertFalse(target.exists(), "File must not exist: " + target);
+        // do it
+        InputOutput sut = new InputOutput();
+        try {
+            sut.move(source.getAbsolutePath(), target.getAbsolutePath());
+            fail("Must throw a NOT_FOUND exception");
+        }
+        catch ( FileException ex ) {
+            if ( ex.getType() != FileException.Type.NOT_FOUND ) {
+                fail("Wrong exception thrown (must be NOT_FOUND): " + ex.getType(), ex);
+            }
+            assertFalse(source.exists(), "File must still not exist: " + source);
+            assertFalse(target.exists(), "File must still not exist: " + target);
+        }
+    }
+
+    @Test
+    public void move_create()
+            throws Exception
+    {
+        File source = new File(MOVE, "first.txt");
+        File target = new File(MOVE, "renamed.txt");
+        assertTrue(source.exists(), "File must exist: " + source);
+        assertFalse(target.exists(), "File must not exist: " + target);
+        // do it
+        InputOutput sut = new InputOutput();
+        sut.move(source.getAbsolutePath(), target.getAbsolutePath());
+        assertFalse(source.exists(), "File must not exist any more: " + source);
+        assertTrue(target.exists(), "File must exist after moving: " + target);
+    }
+
+    @Test
+    public void move_overwrite()
+            throws Exception
+    {
+        File source = new File(MOVE, "second.txt");
+        File target = new File(MOVE, "third.txt");
+        assertTrue(source.exists(), "File must exist: " + source);
+        assertTrue(target.exists(), "File must exist: " + target);
+        assertEquals(TestTools.readTextFile(source), "Second file.\n", "File content: " + source);
+        assertEquals(TestTools.readTextFile(target), "Third file.\n", "File content: " + target);
+        // do it
+        InputOutput sut = new InputOutput();
+        sut.move(source.getAbsolutePath(), target.getAbsolutePath());
+        assertFalse(source.exists(), "File must not exist any more: " + source);
+        assertTrue(target.exists(), "File must exist after moving: " + target);
+        assertEquals(TestTools.readTextFile(target), "Second file.\n",
+                "File content must have been moved: " + target);
+    }
+
+    @Test
+    public void move_toEmptyDir()
+            throws Exception
+    {
+        File source = new File(MOVE, "fourth.txt");
+        File target = new File(MOVE, "empty-dir");
+        assertTrue(source.exists(), "File must exist: " + source);
+        assertTrue(target.exists(), "Dir must exist: " + target);
+        // do it
+        InputOutput sut = new InputOutput();
+        sut.move(source.getAbsolutePath(), target.getAbsolutePath());
+        assertFalse(source.exists(), "File must not exist any more: " + source);
+        File result = new File(target, "fourth.txt");
+        assertTrue(result.exists(), "File must exist after moving: " + result);
+    }
+
+    @Test
+    public void move_dir()
+            throws Exception
+    {
+        File source = new File(MOVE, "dir");
+        File target = new File(MOVE, "renamed-dir");
+        assertTrue(source.exists(), "Dir must exist: " + source);
+        assertFalse(target.exists(), "Dir must not exist: " + target);
+        // do it
+        InputOutput sut = new InputOutput();
+        sut.move(source.getAbsolutePath(), target.getAbsolutePath());
+        assertFalse(source.exists(), "Dir must not exist any more: " + source);
+        assertTrue(target.exists(), "Dir must exist after moving: " + target);
+    }
+
     // ----------------------------------------------------------------------
     //   Test setup
     // ----------------------------------------------------------------------
@@ -344,6 +437,12 @@ public class DirectoryTest
         if ( ! LIST_EMPTY.exists() ) {
             LIST_EMPTY.mkdir();
         }
+        MOVE         = new File(DIR, "move");
+        MOVE_EMPTY   = new File(MOVE, "empty-dir");
+        // because git does not allow to commit an empty directory
+        if ( ! MOVE_EMPTY.exists() ) {
+            MOVE_EMPTY.mkdir();
+        }
     }
 
     private static File DIR          = null;
@@ -352,6 +451,8 @@ public class DirectoryTest
     private static File DELETE_EMPTY = null;
     private static File LIST         = null;
     private static File LIST_EMPTY   = null;
+    private static File MOVE         = null;
+    private static File MOVE_EMPTY   = null;
 }
 
 
