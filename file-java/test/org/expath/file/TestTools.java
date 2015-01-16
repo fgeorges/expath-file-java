@@ -46,6 +46,12 @@ import static org.testng.Assert.fail;
  */
 public class TestTools
 {
+    public static File getTestRsrc()
+    {
+        validateDir(RSRC);
+        return RSRC;
+    }
+
     public static File initArea(String area)
             throws IOException
     {
