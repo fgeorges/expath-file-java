@@ -36,6 +36,15 @@ import java.nio.file.Path;
  */
 class Util
 {
+    public static String stringify(File file)
+    {
+        String s = file.toString();
+        if ( file.isDirectory() && ! s.endsWith("/") ) {
+            s = s + "/";
+        }
+        return s;
+    }
+
     public static Path getPath(String path)
     {
         FileSystem fs = FileSystems.getDefault();
@@ -161,7 +170,7 @@ class Util
             throw FileException.notFound("File not found: " + file);
         }
         if ( f.isDirectory() ) {
-            throw FileException.notFound("File points to a directory: " + file);
+            throw FileException.isDir("File points to a directory: " + file);
         }
         return f;
     }
@@ -193,7 +202,7 @@ class Util
                 throw FileException.isDir("The file already exists and is a directory: " + file, ex);
             }
             if ( ! f.exists() && ! f.getParentFile().isDirectory() ) {
-                throw FileException.isDir("The file must be created and its directory does not exist: " + file, ex);
+                throw FileException.noDir("The file must be created and its directory does not exist: " + file, ex);
             }
             throw FileException.ioError("Error creating or opening the file: " + file, ex);
         }
@@ -211,7 +220,7 @@ class Util
                 throw FileException.isDir("The file already exists and is a directory: " + file, ex);
             }
             if ( ! f.exists() && ! f.getParentFile().isDirectory() ) {
-                throw FileException.isDir("The file must be created and its directory does not exist: " + file, ex);
+                throw FileException.noDir("The file must be created and its directory does not exist: " + file, ex);
             }
             throw FileException.ioError("Error creating or opening the file: " + file, ex);
         }
@@ -230,7 +239,7 @@ class Util
                 throw FileException.isDir("The file already exists and is a directory: " + file, ex);
             }
             if ( ! f.exists() && ! f.getParentFile().isDirectory() ) {
-                throw FileException.isDir("The file must be created and its directory does not exist: " + file, ex);
+                throw FileException.noDir("The file must be created and its directory does not exist: " + file, ex);
             }
             throw FileException.ioError("Error creating or opening the file: " + file, ex);
         }
