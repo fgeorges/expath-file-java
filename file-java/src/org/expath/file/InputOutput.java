@@ -20,7 +20,6 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -233,7 +232,17 @@ public class InputOutput
         }
         else {
             if ( ! f.mkdirs() ) {
-                throw FileException.ioError("Error creating the directory: " + f);
+                // find the first (or "closest") existing ancestor
+                File first = f.getParentFile();
+                while ( null != first && ! first.exists() ) {
+                    first = first.getParentFile();
+                }
+                if ( null != first && first.exists() && ! first.isDirectory() ) {
+                    throw FileException.exists("One of the ancestors already exists as a file: " + first);
+                }
+                else {
+                    throw FileException.ioError("Error creating the directory: " + f);
+                }
             }
         }
     }
@@ -245,32 +254,34 @@ public class InputOutput
     //                      $dir as xs:string) as xs:string
     // [file:no-dir] is raised if the specified directory does not exist or points to a file.
     // [file:io-error] is raised if any other error occurs.
-    public File createTempDir(String prefix, String suffix)
+    public String createTempDir(String prefix, String suffix)
             throws FileException
     {
         try {
-            File f = File.createTempFile(prefix, suffix);
-            return turnIntoDir(f);
+            File file = File.createTempFile(prefix, suffix);
+            File res  = turnIntoDir(file);
+            return Util.stringify(res);
         }
         catch ( IOException ex ) {
             throw FileException.ioError("Error creating the temporary directory", ex);
         }
     }
 
-    public File createTempDir(String prefix, String suffix, String dir)
+    public String createTempDir(String prefix, String suffix, String dir)
             throws FileException
     {
         try {
             File d = new File(dir);
             if ( d.isDirectory() ) {
-                File f = File.createTempFile(prefix, suffix, d);
-                return turnIntoDir(f);
+                File file = File.createTempFile(prefix, suffix, d);
+                File res  = turnIntoDir(file);
+                return Util.stringify(res);
             }
             else if ( d.exists() ) {
-                throw FileException.noDir("The directory where to create a temp dir is not a dir: " + d);
+                throw FileException.noDir("The directory where to create a temp dir is not a dir: " + dir);
             }
             else {
-                throw FileException.noDir("The directory where to create a temp dir does not exist: " + d);
+                throw FileException.noDir("The directory where to create a temp dir does not exist: " + dir);
             }
         }
         catch ( IOException ex ) {
@@ -297,24 +308,26 @@ public class InputOutput
     //                       $dir as xs:string) as xs:string
     // [file:no-dir] is raised if the specified directory does not exist or points to a file.
     // [file:io-error] is raised if any other error occurs.
-    public File createTempFile(String prefix, String suffix)
+    public String createTempFile(String prefix, String suffix)
             throws FileException
     {
         try {
-            return File.createTempFile(prefix, suffix);
+            File file = File.createTempFile(prefix, suffix);
+            return Util.stringify(file);
         }
         catch ( IOException ex ) {
             throw FileException.ioError("Error creating the temporary file", ex);
         }
     }
 
-    public File createTempFile(String prefix, String suffix, String dir)
+    public String createTempFile(String prefix, String suffix, String dir)
             throws FileException
     {
         try {
             File d = new File(dir);
             if ( d.isDirectory() ) {
-                return File.createTempFile(prefix, suffix, d);
+                File file = File.createTempFile(prefix, suffix, d);
+                return Util.stringify(file);
             }
             else if ( d.exists() ) {
                 throw FileException.noDir("The directory where to create a temp file is not a dir: " + d);
@@ -415,23 +428,38 @@ public class InputOutput
             throw FileException.noDir("Not a directory: " + d);
         }
         FilenameFilter filter = pattern == null ? null : new ListFilter(pattern);
+        List<String> list = new ArrayList<>();
         if ( recursive ) {
-            List<String> list = new ArrayList<>();
             listRecurse(d, "", list, filter);
-            return list;
         }
         else {
-            String[] list = d.list(filter);
-            return Arrays.asList(list);
+            for ( File f : d.listFiles(filter) ) {
+                if ( f.isDirectory() ) {
+                    list.add(f.getName() + "/");
+                }
+                else {
+                    list.add(f.getName());
+                }
+            }
         }
+        return list;
     }
 
     private void listRecurse(File dir, String prefix, List<String> list, FilenameFilter filter)
     {
-        for ( File f : dir.listFiles() ) {
+        File[] files = dir.listFiles();
+        if ( null == files ) {
+            return;
+        }
+        for ( File f : files ) {
             String name = f.getName();
             if ( filter == null || filter.accept(dir, name) ) {
-                list.add(prefix + name);
+                if ( f.isDirectory() ) {
+                    list.add(prefix + name + "/");
+                }
+                else {
+                    list.add(prefix + name);
+                }
             }
             if ( f.isDirectory() ) {
                 listRecurse(f, prefix + name + "/" , list, filter);
@@ -530,7 +558,7 @@ public class InputOutput
                 throw FileException.isDir("Target dir contains already a file with the same name: " + dest);
             }
             else {
-                safeMove(source, target);
+                safeMove(source, dest);
             }
         }
         else if ( target.exists() ) {
