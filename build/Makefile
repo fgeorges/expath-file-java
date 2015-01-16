@@ -1,12 +1,12 @@
 j.ver  := 0.1.0pre1
 j.mod  := file-java
-j.root := $(j.mod)-$(j.ver)
+j.jar  := expath-$(j.mod).jar
 j.proj := ../file-java
 j.dist := $(j.proj)/dist
 
 s.ver  := 0.5.0pre1
 s.mod  := file-saxon
-s.root := $(s.mod)-$(s.ver)
+s.root := expath-$(s.mod)-$(s.ver)
 s.file := $(s.root)/content
 s.pkg  := saxon-xar
 s.proj := ../file-saxon
@@ -26,10 +26,10 @@ j.dist:
 	echo "org.expath.file.version=$(j.ver)" >  $(j.prop)
 	echo "org.expath.file.revision=$(rev)"  >> $(j.prop)
 	( cd "$(j.proj)" && ant )
-	cp "$(j.dist)/file-java.jar" "expath-$(j.mod).jar"
+	cp "$(j.dist)/file-java.jar" "$(j.jar)"
 
 j.clean:
-	rm -f "expath-$(j.mod).jar"
+	rm -f "$(j.jar)"
 
 s.dist: s.pkg
 	zip "$(s.root).zip" "$(s.root).xar"
@@ -43,10 +43,11 @@ s.pkg:
 	cp "$(s.pkg)/expath-pkg.xml"  "$(s.root)"
 	cp "$(s.pkg)/saxon.xml"       "$(s.root)"
 	cp "$(s.pkg)/cxan.xml"        "$(s.root)"
+	cp "$(j.dist)/file-java.jar"  "$(s.file)/$(j.mod).jar"
 	cp "$(s.dist)/file-saxon.jar" "$(s.file)/$(s.mod).jar"
 	cp "$(s.pkg)/wrapper.xsl"     "$(s.file)/$(s.mod).xsl"
 	cp "$(s.pkg)/wrapper.xq"      "$(s.file)/$(s.mod).xql"
-	cd "$(s.root)" && zip -r "../expath-$(s.root).xar" *
+	cd "$(s.root)" && zip -r "../$(s.root).xar" *
 
 s.clean:
 	rm -rf "$(s.root)"

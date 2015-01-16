@@ -1,7 +1,7 @@
 /build/expath-file-java.jar
 /build/expath-file-saxon-*.zip
-/build/file-saxon-*.xar
-/build/file-saxon-*/
+/build/expath-file-saxon-*.xar
+/build/expath-file-saxon-*/
 /file-java/src/org/expath/file/version.properties
 /file-java/nbproject/private/
 /file-java/dist/
