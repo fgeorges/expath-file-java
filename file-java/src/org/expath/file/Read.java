@@ -13,7 +13,11 @@ package org.expath.file;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
+import java.nio.charset.CharacterCodingException;
 import java.nio.charset.Charset;
+import java.nio.charset.CharsetDecoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -55,6 +59,9 @@ public class Read
     public byte[] readBinary(String file, long offset)
             throws FileException
     {
+        if ( offset < 0 ) {
+            throw FileException.outOfRange("Offset is negative: " + offset);
+        }
         InputStream in = Util.openInputStream(file);
         try {
             in.skip(offset);
@@ -71,6 +78,12 @@ public class Read
     public byte[] readBinary(String file, long offset, long length)
             throws FileException
     {
+        if ( offset < 0 ) {
+            throw FileException.outOfRange("Offset is negative: " + offset);
+        }
+        if ( length < 0 ) {
+            throw FileException.outOfRange("Length is negative: " + length);
+        }
         InputStream in = Util.openInputStream(file);
         try {
             in.skip(offset);
@@ -108,7 +121,15 @@ public class Read
             throws FileException
     {
         byte[] bytes = readBinary(file);
-        return new String(bytes, encoding);
+        CharsetDecoder decoder = encoding.newDecoder();
+        ByteBuffer buf = ByteBuffer.wrap(bytes);
+        try {
+            CharBuffer chars = decoder.decode(buf);
+            return chars.toString();
+        }
+        catch ( CharacterCodingException ex ) {
+            throw FileException.ioError("Encoding error (" + encoding + ") reading: " + file, ex);
+        }
     }
 
     // file:read-text-lines($file as xs:string) as xs:string*
