@@ -13,3 +13,4 @@
 /file-saxon/build/
 /file-saxon/test-rsrc/stage/
 /file-saxon/test-rsrc/qt3/results/results_*.xml
+/test/repo/
