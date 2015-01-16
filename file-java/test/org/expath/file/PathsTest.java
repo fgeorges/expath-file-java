@@ -53,7 +53,7 @@ public class PathsTest
         String file = new File(PATHS, "file.txt").getPath();
         Paths sut = new Paths();
         String result = sut.parent(file);
-        String expected = PATHS.getAbsolutePath();
+        String expected = PATHS.getAbsolutePath() + "/";
         assertEquals(result, expected, "The name of the parent");
     }
 
@@ -64,7 +64,7 @@ public class PathsTest
         String file = new File(PATHS, "dir/subdir/").getPath();
         Paths sut = new Paths();
         String result = sut.parent(file);
-        String expected = new File(PATHS, "dir").getAbsolutePath();
+        String expected = new File(PATHS, "dir").getAbsolutePath() + "/";
         assertEquals(result, expected, "The name of the parent");
     }
 

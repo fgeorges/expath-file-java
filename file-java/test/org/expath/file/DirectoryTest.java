@@ -82,14 +82,16 @@ public class DirectoryTest
             throws Exception
     {
         InputOutput sut = new InputOutput();
-        File result = sut.createTempDir("prefix-", "-suffix");
+        String result = sut.createTempDir("prefix-", "-suffix");
+        File   file   = new File(result);
         // just because it's created outside of this test area...
         System.out.println("Temp dir: " + result);
-        assertTrue(result.exists(), "Temp dir must exist: " + result);
-        assertTrue(result.isDirectory(), "Temp dir must be a directory: " + result);
-        assertTrue(result.getName().startsWith("prefix-"),
+        assertTrue(file.exists(), "Temp dir must exist: " + result);
+        assertTrue(file.isDirectory(), "Temp dir must be a directory: " + result);
+        assertTrue(result.endsWith("/"), "Temp path must end with a slash: " + result);
+        assertTrue(file.getName().startsWith("prefix-"),
                 "Temp dir name must start with 'prefix-': " + result);
-        assertTrue(result.getName().endsWith("-suffix"),
+        assertTrue(file.getName().endsWith("-suffix"),
                 "Temp dir name must end with '-suffix': " + result);
     }
 
@@ -98,15 +100,17 @@ public class DirectoryTest
             throws Exception
     {
         InputOutput sut = new InputOutput();
-        File result = sut.createTempDir("prefix-", "-suffix", CREATE_DIR.getAbsolutePath());
-        assertTrue(result.exists(), "Temp dir must exist: " + result);
-        assertTrue(result.isDirectory(), "Temp dir must be a directory: " + result);
-        assertTrue(result.getName().startsWith("prefix-"),
+        String result = sut.createTempDir("prefix-", "-suffix", CREATE_DIR.getAbsolutePath());
+        File   file   = new File(result);
+        assertTrue(file.exists(), "Temp dir must exist: " + result);
+        assertTrue(file.isDirectory(), "Temp dir must be a directory: " + result);
+        assertTrue(result.endsWith("/"), "Temp path must end with a slash: " + result);
+        assertTrue(file.getName().startsWith("prefix-"),
                 "Temp dir name must start with 'prefix-': " + result);
-        assertTrue(result.getName().endsWith("-suffix"),
+        assertTrue(file.getName().endsWith("-suffix"),
                 "Temp dir name must end with '-suffix': " + result);
-        assertEquals(result.getParentFile(), CREATE_DIR,
-                "Temp dir parent must be CREATE_DIR: " + result.getParent());
+        assertEquals(file.getParentFile(), CREATE_DIR,
+                "Temp dir parent must be CREATE_DIR: " + file.getParent());
     }
 
     @Test
@@ -114,14 +118,16 @@ public class DirectoryTest
             throws Exception
     {
         InputOutput sut = new InputOutput();
-        File result = sut.createTempFile("prefix-", "-suffix");
+        String result = sut.createTempFile("prefix-", "-suffix");
+        File   file   = new File(result);
         // just because it's created outside of this test area...
         System.out.println("Temp file: " + result);
-        assertTrue(result.exists(), "Temp file must exist: " + result);
-        assertFalse(result.isDirectory(), "Temp file must not be a directory: " + result);
-        assertTrue(result.getName().startsWith("prefix-"),
+        assertTrue(file.exists(), "Temp file must exist: " + result);
+        assertFalse(file.isDirectory(), "Temp file must not be a directory: " + result);
+        assertFalse(result.endsWith("/"), "Temp path must not end with a slash: " + result);
+        assertTrue(file.getName().startsWith("prefix-"),
                 "Temp file name must start with 'prefix-': " + result);
-        assertTrue(result.getName().endsWith("-suffix"),
+        assertTrue(file.getName().endsWith("-suffix"),
                 "Temp file name must end with '-suffix': " + result);
     }
 
@@ -130,15 +136,17 @@ public class DirectoryTest
             throws Exception
     {
         InputOutput sut = new InputOutput();
-        File result = sut.createTempFile("prefix-", "-suffix", CREATE_DIR.getAbsolutePath());
-        assertTrue(result.exists(), "Temp file must exist: " + result);
-        assertFalse(result.isDirectory(), "Temp file must not be a directory: " + result);
-        assertTrue(result.getName().startsWith("prefix-"),
+        String result = sut.createTempFile("prefix-", "-suffix", CREATE_DIR.getAbsolutePath());
+        File   file   = new File(result);
+        assertTrue(file.exists(), "Temp file must exist: " + result);
+        assertFalse(file.isDirectory(), "Temp file must not be a directory: " + result);
+        assertFalse(result.endsWith("/"), "Temp path must not end with a slash: " + result);
+        assertTrue(file.getName().startsWith("prefix-"),
                 "Temp file name must start with 'prefix-': " + result);
-        assertTrue(result.getName().endsWith("-suffix"),
+        assertTrue(file.getName().endsWith("-suffix"),
                 "Temp file name must end with '-suffix': " + result);
-        assertEquals(result.getParentFile(), CREATE_DIR,
-                "Temp file parent must be CREATE_DIR: " + result.getParent());
+        assertEquals(file.getParentFile(), CREATE_DIR,
+                "Temp file parent must be CREATE_DIR: " + file.getParent());
     }
 
     @Test
@@ -280,7 +288,7 @@ public class DirectoryTest
         Collections.sort(result);
         List<String> expected = new ArrayList<>();
         expected.add("file.txt");
-        expected.add("subdir");
+        expected.add("subdir/");
         assertEquals(result, expected, "Files listed are wrong: " + dir);
     }
 
@@ -294,7 +302,7 @@ public class DirectoryTest
         Collections.sort(result);
         List<String> expected = new ArrayList<>();
         expected.add("file.txt");
-        expected.add("subdir");
+        expected.add("subdir/");
         assertEquals(result, expected, "Files listed are wrong: " + dir);
     }
 
@@ -308,7 +316,7 @@ public class DirectoryTest
         Collections.sort(result);
         List<String> expected = new ArrayList<>();
         expected.add("file.txt");
-        expected.add("subdir");
+        expected.add("subdir/");
         expected.add("subdir/file.txt");
         assertEquals(result, expected, "Files listed are wrong: " + dir);
     }
