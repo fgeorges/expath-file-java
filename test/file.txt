@@ -1,0 +1,21 @@
+Hello, world!
+<?xml version="1.0" encoding="UTF-8"?>Hello, you!
+<?xml version="1.0" encoding="UTF-8"?>Hello, you!
+<?xml version="1.0" encoding="UTF-8"?>Hello, you!
+<?xml version="1.0" encoding="UTF-8"?>Hello, you!
+<?xml version="1.0" encoding="UTF-8"?>Hello, you!
+Hello, serial!
+<?xml version="1.0" encoding="UTF-8"?>Hello, you!
+Hello, serial!
+<?xml version="1.0" encoding="UTF-8"?>Hello, you!
+Hello, serial!
+<?xml version="1.0" encoding="UTF-8"?>Hello, you!
+Hello, serial!
+<?xml version="1.0" encoding="UTF-8"?>Hello, you!
+Hello, serial!
+<?xml version="1.0" encoding="UTF-8"?>Hello, you!
+Hello, serial!
+<?xml version="1.0" encoding="UTF-8"?>Hello, you!
+Hello, serial!
+<?xml version="1.0" encoding="UTF-8"?>Hello, you!
+Hello, serial!
