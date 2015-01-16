@@ -51,6 +51,13 @@ public class Properties
     // file:temp-dir() as xs:string
     public String tempDir()
     {
+        if ( ! TEMP_DIR.endsWith(dirSeparator()) ) {
+            synchronized ( getClass() ) {
+                if ( ! TEMP_DIR.endsWith(dirSeparator()) ) {
+                    TEMP_DIR += dirSeparator();
+                }
+            }
+        }
         return TEMP_DIR;
     }
 
@@ -130,7 +137,7 @@ public class Properties
             throws FileException
     {
         try {
-            return Files.size(path);
+            return Files.isDirectory(path) ? 0 : Files.size(path);
         }
         catch ( NoSuchFileException ex ) {
             throw FileException.notFound("No size for non-existing file " + path, ex);
@@ -140,7 +147,7 @@ public class Properties
         }
     }
 
-    private static final String TEMP_DIR = System.getProperty("java.io.tmpdir");
+    private static String TEMP_DIR = System.getProperty("java.io.tmpdir");
 }
 
 
