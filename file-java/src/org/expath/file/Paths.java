@@ -13,7 +13,6 @@ package org.expath.file;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
-import java.net.URISyntaxException;
 
 /**
  * Facade for EXPath File module functions in the section "Paths".
@@ -28,16 +27,22 @@ public class Paths
     // file:name($path as xs:string) as xs:string
     public String name(String path)
     {
-        File f = new File(path);
-        return f.getName();
+        if ( File.separator.equals(path) ) {
+            return "";
+        }
+        else {
+            File f = new File(path);
+            return f.getName();
+        }
     }
 
     // file:parent($path as xs:string) as xs:string?
     public String parent(String path)
     {
-        File f = new File(path);
+        File f   = new File(path);
         File abs = f.getAbsoluteFile();
-        return abs.getParent();
+        File p   = abs.getParentFile();
+        return null == p ? null : Util.stringify(p);
     }
 
     // file:path-to-native($path as xs:string) as xs:string
@@ -47,7 +52,7 @@ public class Paths
     {
         try {
             File f = new File(path);
-            return f.getCanonicalPath();
+            return Util.stringify(f.getCanonicalFile());
         }
         catch ( IOException ex ) {
             throw FileException.ioError("Error getting the native path", ex);
@@ -67,7 +72,7 @@ public class Paths
     public String resolvePath(String path)
     {
         File f = new File(path);
-        return f.getAbsolutePath();
+        return Util.stringify(f.getAbsoluteFile());
     }
 }
 
