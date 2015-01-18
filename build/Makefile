@@ -1,10 +1,10 @@
-j.ver  := 0.1.0pre1
+j.ver  := 0.1.0
 j.mod  := file-java
-j.jar  := expath-$(j.mod).jar
+j.jar  := expath-$(j.mod)-$(j.ver).jar
 j.proj := ../file-java
 j.dist := $(j.proj)/dist
 
-s.ver  := 0.5.0pre1
+s.ver  := 0.5.0
 s.mod  := file-saxon
 s.root := expath-$(s.mod)-$(s.ver)
 s.file := $(s.root)/content
