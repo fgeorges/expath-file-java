@@ -20,7 +20,6 @@ import net.sf.saxon.s9api.XdmNode;
 import net.sf.saxon.testdriver.Environment;
 import net.sf.saxon.testdriver.QT3TestDriverHE;
 import net.sf.saxon.trans.SymbolicName;
-import org.expath.file.TestTools;
 import org.expath.file.saxon.EXPathFileLibrary;
 import org.expath.tools.ToolsException;
 import org.expath.tools.saxon.fun.Library;
@@ -29,6 +28,14 @@ import org.expath.tools.saxon.fun.Library;
  * Driver to the QT3 test suite from the EXPath Community Group.
  * 
  * Extends the Saxon driver to configure it properly with extension functions.
+ * 
+ * DO NOT RUN IT FROM NetBeans!  The Saxon test driver requires the current
+ * working directory to be the QT3 directory, and there is no way to set the
+ * current directory in Java.  This is because the EXPath File function create
+ * sometimes files, and they use the current directory to resolve paths.
+ * 
+ * Execute the class from file-saxon/test-rsrc/qt3/Makefile, which (re)compiles
+ * and sets the classpath properly.
  * 
  * @author Florent Georges
  * @date   2015-01-15
@@ -39,8 +46,18 @@ public class Driver
     public static void main(String[] args)
             throws Exception
     {
-        File rsrc    = TestTools.getTestRsrc();
-        File qt3     = new File(rsrc, "qt3");
+        if ( args.length < 1 ) {
+            throw new Exception(
+                    "Missing parameter, must pass the test-rsrc/qt3/ absolut path,"
+                    + " which must be the current directory as well!");
+        }
+        File qt3     = new File(args[0]);
+        if ( ! qt3.exists() ) {
+            throw new Exception("File does not exist: " + qt3);
+        }
+        if ( ! qt3.isDirectory() ) {
+            throw new Exception("File is not a directory: " + qt3);
+        }
         File catalog = new File(qt3, "catalog.xml");
         File results = new File(qt3, "results");
         new Driver().go(new String[]{
