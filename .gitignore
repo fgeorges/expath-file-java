@@ -1,4 +1,4 @@
-/build/expath-file-java.jar
+/build/expath-file-java-*.jar
 /build/expath-file-saxon-*.zip
 /build/expath-file-saxon-*.xar
 /build/expath-file-saxon-*/
