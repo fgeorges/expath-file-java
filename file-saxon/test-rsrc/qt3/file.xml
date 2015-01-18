@@ -4,16 +4,17 @@
     directory containing this test catalog file.</description>
   <link type="spec" document="http://expath.org/spec/binary"/>
 
-  <dependency type="spec" value="XQ30+"/>
+  <dependency type="spec" value="XQ30+ XP30+"/>
 
-  <environment name="file">
+  <environment name="EXPath-file">
     <namespace prefix="file" uri="http://expath.org/ns/file"/>
   </environment>
 
-  <test-case name="file-exists-001">
+  <test-case name="EXPath-file-exists-001">
     <description>Use file:exists on an existing file</description>
     <created by="Michael Kay" on="2012-06-11"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         file:exists("sandpit/test.bin")
       </test>
@@ -22,10 +23,11 @@
     </result>
   </test-case>
 
-  <test-case name="file-exists-002">
+  <test-case name="EXPath-file-exists-002">
     <description>Use file:exists on an existing directory</description>
     <created by="Michael Kay" on="2012-06-11"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         file:exists("sandpit")
       </test>
@@ -34,10 +36,11 @@
     </result>
   </test-case>
 
-  <test-case name="file-exists-003">
+  <test-case name="EXPath-file-exists-003">
     <description>Use file:exists on a non-existing file</description>
     <created by="Michael Kay" on="2012-06-11"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         file:exists("sandpit/nonexisting-file.txt")
       </test>
@@ -46,10 +49,11 @@
     </result>
   </test-case>
 
-  <test-case name="file-exists-004">
+  <test-case name="EXPath-file-exists-004">
     <description>Use file:exists on the current directory</description>
     <created by="Michael Kay" on="2012-06-11"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         file:exists(".")</test>
     <result>
@@ -57,10 +61,11 @@
     </result>
   </test-case>
   
-  <test-case name="file-exists-005">
+  <test-case name="EXPath-file-exists-005">
     <description>Use file:exists on an empty sequence</description>
     <created by="Michael Kay" on="2014-04-22"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         file:exists(())</test>
     <result>
@@ -68,10 +73,11 @@
     </result>
   </test-case>
   
-  <test-case name="file-exists-006">
+  <test-case name="EXPath-file-exists-006">
     <description>Use file:exists on a URI (works by virtue of URI promotion)</description>
     <created by="Michael Kay" on="2014-04-22"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         file:exists(xs:anyURI('sandpit'))</test>
     <result>
@@ -79,10 +85,11 @@
     </result>
   </test-case>
   
-  <test-case name="file-exists-007">
+  <test-case name="EXPath-file-exists-007">
     <description>Use file:exists on a sequence of names</description>
     <created by="Michael Kay" on="2014-04-22"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         file:exists(("sandpit", "."))</test>
     <result>
@@ -90,21 +97,67 @@
     </result>
   </test-case>
   
-  <test-case name="file-exists-008">
+  <test-case name="EXPath-file-exists-008">
     <description>Use file:exists on an integer</description>
     <created by="Michael Kay" on="2014-04-22"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         file:exists(if (current-date() gt xs:date('1900-01-01')) then 23 else 'sandpit')</test>
     <result>
       <error code="XPTY0004"/>
     </result>
   </test-case>
+  
+  <test-case name="EXPath-file-exists-009">
+    <description>Use file:exists on an filename with spaces</description>
+    <created by="John Lumley" on="2015-01-13"/>
+    <environment ref="EXPath-file"/>
+    <test>
+      file:exists("sandpit/my file.txt")</test>
+    <result>
+      <assert-true/>
+    </result>
+  </test-case>
+  
+  <test-case name="EXPath-file-exists-010">
+    <description>Use file:exists on an filename with spaces and backslashes</description>
+    <created by="John Lumley" on="2015-01-13"/>
+    <environment ref="EXPath-file"/>
+    <test>
+      file:exists("sandpit//\my file.txt")</test>
+    <result>
+      <assert-true/>
+    </result>
+  </test-case>
+  
+  <test-case name="EXPath-file-exists-011">
+    <description>Use file:exists on a filename with encoded spaces</description>
+    <created by="John Lumley" on="2015-01-13"/>
+    <environment ref="EXPath-file"/>
+    <test>
+      file:exists("sandpit/my%20file.txt")</test>
+    <result>
+      <assert-false/>
+    </result>
+  </test-case>
+  <test-case name="EXPath-file-exists-012">
+    <description>Use file:exists on a URI generated from a filename with spaces</description>
+    <created by="John Lumley" on="2015-01-13"/>
+    <environment ref="EXPath-file"/>
+    <test>
+      file:exists(file:path-to-uri("sandpit/my file.txt"))</test>
+    <result>
+      <assert-true/>
+    </result>
+  </test-case>
+ 
 
-  <test-case name="file-isDir-001">
+  <test-case name="EXPath-file-isDir-001">
     <description>Use file:is-dir on an existing file</description>
     <created by="Michael Kay" on="2012-06-11"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         file:is-dir("sandpit/test.bin")</test>
     <result>
@@ -112,10 +165,11 @@
     </result>
   </test-case>
 
-  <test-case name="file-isDir-002">
+  <test-case name="EXPath-file-isDir-002">
     <description>Use file:is-dir on an existing directory</description>
     <created by="Michael Kay" on="2012-06-11"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         file:is-dir("sandpit")</test>
     <result>
@@ -123,10 +177,11 @@
     </result>
   </test-case>
 
-  <test-case name="file-isDir-003">
+  <test-case name="EXPath-file-isDir-003">
     <description>Use file:is-dir on a non-existing file</description>
     <created by="Michael Kay" on="2012-06-11"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         file:is-dir("sandpit/nonexisting-file.txt")</test>
     <result>
@@ -134,10 +189,11 @@
     </result>
   </test-case>
 
-  <test-case name="file-isDir-004">
+  <test-case name="EXPath-file-isDir-004">
     <description>Use file:is-dir on the current directory</description>
     <created by="Michael Kay" on="2012-06-11"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         file:is-dir(".")</test>
     <result>
@@ -145,10 +201,11 @@
     </result>
   </test-case>
 
-  <test-case name="file-isDir-005">
+  <test-case name="EXPath-file-isDir-005">
     <description>Use file:is-dir on the parent of the current directory</description>
     <created by="Michael Kay" on="2012-06-11"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         file:is-dir("..")</test>
     <result>
@@ -156,10 +213,11 @@
     </result>
   </test-case>
   
-  <test-case name="file-isDir-006">
+  <test-case name="EXPath-file-isDir-006">
     <description>Use file:is-dir on an empty sequence</description>
     <created by="Michael Kay" on="2014-04-22"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         file:is-dir(())</test>
     <result>
@@ -167,10 +225,11 @@
     </result>
   </test-case>
   
-  <test-case name="file-isDir-007">
+  <test-case name="EXPath-file-isDir-007">
     <description>Use file:is-dir on an sequence of more than one entry</description>
     <created by="Michael Kay" on="2014-04-22"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         file:is-dir((".", ".."))</test>
     <result>
@@ -178,10 +237,11 @@
     </result>
   </test-case>
 
-  <test-case name="file-isFile-001">
+  <test-case name="EXPath-file-isFile-001">
     <description>Use file:is-file on an existing file</description>
     <created by="Michael Kay" on="2012-06-11"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         file:is-file("sandpit/test.bin")</test>
     <result>
@@ -189,10 +249,11 @@
     </result>
   </test-case>
 
-  <test-case name="file-isFile-002">
+  <test-case name="EXPath-file-isFile-002">
     <description>Use file:is-file on an existing directory</description>
     <created by="Michael Kay" on="2012-06-11"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         file:is-file("sandpit")</test>
     <result>
@@ -200,10 +261,11 @@
     </result>
   </test-case>
 
-  <test-case name="file-isFile-003">
+  <test-case name="EXPath-file-isFile-003">
     <description>Use file:is-file on a non-existing file</description>
     <created by="Michael Kay" on="2012-06-11"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         file:is-file("sandpit/nonexisting-file.txt")</test>
     <result>
@@ -211,10 +273,11 @@
     </result>
   </test-case>
 
-  <test-case name="file-isFile-004">
+  <test-case name="EXPath-file-isFile-004">
     <description>Use file:is-file on the current directory</description>
     <created by="Michael Kay" on="2012-06-11"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         file:is-file(".")</test>
     <result>
@@ -222,10 +285,11 @@
     </result>
   </test-case>
   
-  <test-case name="file-isFile-005">
+  <test-case name="EXPath-file-isFile-005">
     <description>Use file:is-file on a URI</description>
     <created by="Michael Kay" on="2014-04-22"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         file:is-file(xs:anyURI('sandpit/test.bin'))</test>
     <result>
@@ -233,10 +297,11 @@
     </result>
   </test-case>
   
-  <test-case name="file-isFile-006">
+  <test-case name="EXPath-file-isFile-006">
     <description>Use file:is-file on a QName</description>
     <created by="Michael Kay" on="2014-04-22"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         file:is-file(QName('http://saxon.sf.net/', 'local-name'))</test>
     <result>
@@ -244,10 +309,11 @@
     </result>
   </test-case>
 
-  <test-case name="file-last-modified-001">
+  <test-case name="EXPath-file-last-modified-001">
     <description>Use file:last-modified on a file</description>
     <created by="Michael Kay" on="2012-06-11"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         file:append-text("sandpit/test.txt", "a"),
         file:last-modified("sandpit/test.txt")</test>
@@ -261,10 +327,11 @@
     </result>
   </test-case>
 
-  <test-case name="file-last-modified-002">
+  <test-case name="EXPath-file-last-modified-002">
     <description>Use file:last-modified on a directory</description>
     <created by="Michael Kay" on="2012-06-11"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         (if (file:exists("sandpit/testdir")) 
           then file:delete("sandpit/testdir")
@@ -281,10 +348,11 @@
     </result>
   </test-case>
 
-  <test-case name="file-last-modified-003">
+  <test-case name="EXPath-file-last-modified-003">
     <description>Use file:last-modified on a non-existent path</description>
     <created by="Michael Kay" on="2012-06-11"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         file:last-modified("sandpit/nonexistent.txt")</test>
     <result>
@@ -292,10 +360,11 @@
     </result>
   </test-case>
 
-  <test-case name="file-size-001">
+  <test-case name="EXPath-file-size-001">
     <description>Use file:size on a text file</description>
     <created by="Michael Kay" on="2012-06-11"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         (if (file:exists("sandpit/test.txt")) 
           then file:delete("sandpit/test.txt")
@@ -307,10 +376,11 @@
     </result>
   </test-case>
 
-  <test-case name="file-size-002">
+  <test-case name="EXPath-file-size-002">
     <description>Use file:size on an empty file</description>
     <created by="Michael Kay" on="2012-06-11"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         (if (file:exists("sandpit/test.txt")) 
           then file:delete("sandpit/test.txt")
@@ -322,10 +392,11 @@
     </result>
   </test-case>
 
-  <test-case name="file-size-003">
+  <test-case name="EXPath-file-size-003">
     <description>Use file:size on a binary file</description>
     <created by="Michael Kay" on="2012-06-11"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         (if (file:exists("sandpit/test.bin")) 
           then file:delete("sandpit/test.bin")
@@ -340,10 +411,11 @@
     </result>
   </test-case>
 
-  <test-case name="file-size-004">
+  <test-case name="EXPath-file-size-004">
     <description>Use file:size on a nonexistent file</description>
     <created by="Michael Kay" on="2012-06-11"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         file:size("sandpit/nonexistent.bin")</test>
     <result>
@@ -351,11 +423,12 @@
     </result>
   </test-case>
 
-  <test-case name="file-size-005">
+  <test-case name="EXPath-file-size-005">
     <description>Use file:size on a directory</description>
     <created by="Michael Kay" on="2012-06-11"/>
     <modified by="Christian Grün" on="2013-11-20" change="Aligned with latest spec (20131120)"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         file:size("sandpit")</test>
     <result>
@@ -363,11 +436,12 @@
     </result>
   </test-case>
 
-  <test-case name="file-append2-001">
+  <test-case name="EXPath-file-append2-001">
     <description>Use file:append with two arguments</description>
     <created by="Michael Kay" on="2012-06-15"/>
     <modified by="Christian Grün" on="2013-11-20" change="omit-xml-declaration may be true"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         (if (file:exists("sandpit/test.txt")) 
           then file:delete("sandpit/test.txt")
@@ -381,11 +455,12 @@
     </result>
   </test-case>
 
-  <test-case name="file-append2-002">
+  <test-case name="EXPath-file-append2-002">
     <description>Use file:append with two arguments</description>
     <created by="Michael Kay" on="2012-06-15"/>
     <modified by="Christian Grün" on="2013-11-20" change="omit-xml-declaration may be true"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <dependency type="spec" value="XQ10+"/>
     <test><![CDATA[
          (if (file:exists("sandpit/test.txt")) 
@@ -401,10 +476,11 @@
     </result>
   </test-case>
   
-  <test-case name="file-append2-003">
+  <test-case name="EXPath-file-append2-003">
     <description>Use file:append with two arguments; first argument incorrect type</description>
     <created by="Michael Kay" on="2014-04-22"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         file:append("sandpit/test.txt"[3], ("a", "b", "c", 10))</test>
     <result>
@@ -412,10 +488,11 @@
     </result>
   </test-case>
 
-  <test-case name="file-appendText2-001">
+  <test-case name="EXPath-file-appendText2-001">
     <description>Use file:append-text with two arguments</description>
     <created by="Michael Kay" on="2012-06-11"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         (if (file:exists("sandpit/test.txt")) 
           then file:delete("sandpit/test.txt")
@@ -432,10 +509,11 @@
     </result>
   </test-case>
 
-  <test-case name="file-appendText2-002">
+  <test-case name="EXPath-file-appendText2-002">
     <description>Use file:append-text writing to an existing file</description>
     <created by="Michael Kay" on="2012-06-11"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         file:append-text("sandpit/test.txt", "d"),
         file:append-text("sandpit/test.txt", "e"),
@@ -449,10 +527,11 @@
     </result>
   </test-case>
 
-  <test-case name="file-appendText2-003">
+  <test-case name="EXPath-file-appendText2-003">
     <description>Use file:append-text writing empty string</description>
     <created by="Michael Kay" on="2012-06-11"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>file:append-text("sandpit/test.txt", "")</test>
     <result>
       <all-of>
@@ -462,10 +541,11 @@
     </result>
   </test-case>
 
-  <test-case name="file-appendText2-004">
+  <test-case name="EXPath-file-appendText2-004">
     <description>Use file:append-text : default encoding is UTF-8</description>
     <created by="Michael Kay" on="2012-06-11"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>file:append-text("sandpit/test.txt", "&#xa3;")</test>
     <result>
       <all-of>
@@ -476,10 +556,11 @@
     </result>
   </test-case>
 
-  <test-case name="file-appendText2-005">
+  <test-case name="EXPath-file-appendText2-005">
     <description>Use file:append-text with two arguments: file is a directory</description>
     <created by="Michael Kay" on="2012-06-11"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         file:append-text("sandpit", "abc")</test>
     <result>
@@ -487,11 +568,12 @@
     </result>
   </test-case>
 
-  <test-case name="file-appendText2-006">
+  <test-case name="EXPath-file-appendText2-006">
     <description>Use file:append-text with two arguments: attempt to create file in non-existent
       directory</description>
     <created by="Michael Kay" on="2012-06-11"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         file:append-text("nonexistent/file.xml", "abc")</test>
     <result>
@@ -499,10 +581,11 @@
     </result>
   </test-case>
 
-  <test-case name="file-appendText3-001">
+  <test-case name="EXPath-file-appendText3-001">
     <description>Use file:append-text with three arguments, UTF-8</description>
     <created by="Michael Kay" on="2012-06-11"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         (if (file:exists("sandpit/test2.txt")) 
           then file:delete("sandpit/test2.txt")
@@ -524,11 +607,12 @@
     </result>
   </test-case>
 
-  <test-case name="file-appendText3-002">
+  <test-case name="EXPath-file-appendText3-002">
     <description>Use file:append-text with three arguments: UTF-16 encoding</description>
     <modified by="Christian Grün" on="2013-11-20" change="Alternative without BOM added"/>
     <created by="Michael Kay" on="2012-06-11"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         (if (file:exists("sandpit/test3.txt")) 
           then file:delete("sandpit/test3.txt")
@@ -546,10 +630,11 @@
     </result>
   </test-case>
 
-  <test-case name="file-appendText3-003">
+  <test-case name="EXPath-file-appendText3-003">
     <description>Use file:append-text with three arguments: unsupported encoding</description>
     <created by="Michael Kay" on="2012-06-11"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         (if (file:exists("sandpit/test4.txt")) 
           then file:delete("sandpit/test4.txt")
@@ -560,10 +645,11 @@
     </result>
   </test-case>
 
-  <test-case name="file-appendText3-004">
+  <test-case name="EXPath-file-appendText3-004">
     <description>Use file:append-text with three arguments: file is a directory</description>
     <created by="Michael Kay" on="2012-06-11"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         file:append-text("sandpit", "abc", "UTF-8")</test>
     <result>
@@ -571,11 +657,12 @@
     </result>
   </test-case>
 
-  <test-case name="file-appendText3-005">
+  <test-case name="EXPath-file-appendText3-005">
     <description>Use file:append-text with two arguments: attempt to create file in non-existent
       directory</description>
     <created by="Michael Kay" on="2012-06-11"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         file:append-text("nonexistent/file.xml", "abc", "UTF-8")</test>
     <result>
@@ -583,10 +670,11 @@
     </result>
   </test-case>
   
-  <test-case name="file-appendText3-006">
+  <test-case name="EXPath-file-appendText3-006">
     <description>Use file:append-text with three arguments: encoding is an empty sequence</description>
     <created by="Michael Kay" on="2014-04-22"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         file:append-text("sandpit", "abc", ())</test>
     <result>
@@ -594,10 +682,11 @@
     </result>
   </test-case>
 
-  <test-case name="file-appendBinary2-001">
+  <test-case name="EXPath-file-appendBinary2-001">
     <description>Use file:append-binary with two arguments</description>
     <created by="Michael Kay" on="2012-06-11"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         (if (file:exists("sandpit/test.bin")) 
           then file:delete("sandpit/test.bin")
@@ -612,10 +701,11 @@
     </result>
   </test-case>
 
-  <test-case name="file-appendBinary2-002">
+  <test-case name="EXPath-file-appendBinary2-002">
     <description>Use file:append-binary with two arguments, append to existing file</description>
     <created by="Michael Kay" on="2012-06-11"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         file:append-binary("sandpit/test.bin", 
             xs:base64Binary(xs:hexBinary("05"))),
@@ -631,10 +721,11 @@
     </result>
   </test-case>
 
-  <test-case name="file-appendBinary2-003">
+  <test-case name="EXPath-file-appendBinary2-003">
     <description>Use file:append-binary: file is a directory</description>
     <created by="Michael Kay" on="2012-06-11"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         file:append-binary("sandpit", xs:base64Binary(""))</test>
     <result>
@@ -642,11 +733,12 @@
     </result>
   </test-case>
 
-  <test-case name="file-appendBinary2-004">
+  <test-case name="EXPath-file-appendBinary2-004">
     <description>Use file:append-binary: attempt to create file in non-existent
       directory</description>
     <created by="Michael Kay" on="2012-06-11"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         file:append-binary("nonexistent/file.bin", xs:base64Binary(""))
       </test>
@@ -655,10 +747,11 @@
     </result>
   </test-case>
 
-  <test-case name="file-copy-001">
+  <test-case name="EXPath-file-copy-001">
     <description>file:copy existing file, overwriting existing file</description>
     <created by="Michael Kay" on="2012-06-11"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         file:write-text("sandpit/source.txt", "defenestration"),
         file:write-text("sandpit/target.txt", "prague"),
@@ -674,10 +767,11 @@
     </result>
   </test-case>
 
-  <test-case name="file-copy-002">
+  <test-case name="EXPath-file-copy-002">
     <description>file:copy existing file, creating target file</description>
     <created by="Michael Kay" on="2012-06-11"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         file:write-text("sandpit/source.txt", "treaty"),
         file:delete("sandpit/target.txt"),
@@ -692,10 +786,11 @@
     </result>
   </test-case>
 
-  <test-case name="file-copy-003">
+  <test-case name="EXPath-file-copy-003">
     <description>file:copy existing file, creating target file in specified directory</description>
     <created by="Michael Kay" on="2012-06-11"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         file:write-text("sandpit/source.txt", "persecution"),
         if (file:exists("sandpit/dir2")) then file:delete("sandpit/dir2", true()) else (),
@@ -713,10 +808,11 @@
     </result>
   </test-case>
 
-  <test-case name="file-copy-004">
+  <test-case name="EXPath-file-copy-004">
     <description>file:copy used to copy a directory, target directory does not exist</description>
     <created by="Michael Kay" on="2012-06-11"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         if (file:exists("sandpit/dirsource")) then file:delete("sandpit/dirsource", true()) else (),
         if (file:exists("sandpit/dirtarget")) then file:delete("sandpit/dirtarget", true()) else (),
@@ -738,11 +834,12 @@
     </result>
   </test-case>
 
-  <test-case name="file-copy-005">
+  <test-case name="EXPath-file-copy-005">
     <description>file:copy used to copy a directory, target directory exists</description>
     <created by="Michael Kay" on="2012-06-11"/>
     <modified by="Christian Grün" on="2013-11-20" change="Aligned with latest spec (20131120)"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         if (file:exists("sandpit/dirsource")) then file:delete("sandpit/dirsource", true()) else (),
         if (file:exists("sandpit/dirtarget")) then file:delete("sandpit/dirtarget", true()) else (),
@@ -757,11 +854,6 @@
     <result>
       <all-of>
         <assert-empty/>
-<!--
-TODO: FIXME:
-Wording is not clear in spec: http://expath.org/spec/file#fn.copy.
-This is a "merge".  But should a sub-dir be created or not?
--->
         <assert>Q{http://expath.org/ns/file}exists("sandpit/dirtarget/dirsource/paris.txt")</assert>
         <assert>Q{http://expath.org/ns/file}read-text("sandpit/dirtarget/dirsource/paris.txt") eq
           "paris"</assert>
@@ -773,10 +865,11 @@ This is a "merge".  But should a sub-dir be created or not?
     </result>
   </test-case>
 
-  <test-case name="file-createDir-001">
+  <test-case name="EXPath-file-createDir-001">
     <description>Create directory: parent exists but target doesn't</description>
     <created by="Michael Kay" on="2012-06-11"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         if (file:exists("sandpit/dir3")) then file:delete("sandpit/dir3", true()) else (),
         file:create-dir("sandpit/dir3"),
@@ -791,11 +884,12 @@ This is a "merge".  But should a sub-dir be created or not?
     </result>
   </test-case>
 
-  <test-case name="file-createDir-002">
+  <test-case name="EXPath-file-createDir-002">
     <description>Create directory: parent exists and target already exists (spec
       unclear)</description>
     <created by="Michael Kay" on="2012-06-11"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         file:create-dir("sandpit/dir3"),
         file:create-dir("sandpit/dir3"),
@@ -810,10 +904,11 @@ This is a "merge".  But should a sub-dir be created or not?
     </result>
   </test-case>
 
-  <test-case name="file-createDir-003">
+  <test-case name="EXPath-file-createDir-003">
     <description>Create directory: parent exists and target already exists as a file</description>
     <created by="Michael Kay" on="2012-06-11"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         if (file:exists("sandpit/dir3")) then file:delete("sandpit/dir3", true()) else (),
         file:create-dir("sandpit/dir3"),
@@ -826,10 +921,11 @@ This is a "merge".  But should a sub-dir be created or not?
     </result>
   </test-case>
 
-  <test-case name="file-createDir-004">
+  <test-case name="EXPath-file-createDir-004">
     <description>Create directory: parent already exists as a file</description>
     <created by="Michael Kay" on="2012-06-11"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         if (file:exists("sandpit/dir3")) then file:delete("sandpit/dir3", true()) else (),
         file:create-dir("sandpit/dir3"),
@@ -842,10 +938,11 @@ This is a "merge".  But should a sub-dir be created or not?
     </result>
   </test-case>
 
-  <test-case name="file-createDir-005">
+  <test-case name="EXPath-file-createDir-005">
     <description>Create directory: create several levels of directory</description>
     <created by="Michael Kay" on="2012-06-11"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         if (file:exists("sandpit/dir3")) then file:delete("sandpit/dir3", true()) else (),
         file:create-dir("sandpit/dir3/dir4/dir5/dir6")
@@ -865,10 +962,11 @@ This is a "merge".  But should a sub-dir be created or not?
     </result>
   </test-case>
 
-  <test-case name="file-createTempFile-001">
+  <test-case name="EXPath-file-createTempFile-001">
     <description>Create temporary file: in default location</description>
     <created by="John Lumley" on="2013-11-27"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         file:create-temp-file("EXPathFile",".tmp")
       </test>
@@ -881,10 +979,11 @@ This is a "merge".  But should a sub-dir be created or not?
       </all-of>
     </result>
   </test-case>
-  <test-case name="file-createTempFile-002">
+  <test-case name="EXPath-file-createTempFile-002">
     <description>Create temporary file: in defined location</description>
     <created by="John Lumley" on="2013-11-27"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         if (file:exists("sandpit/temp")) then () else file:create-dir("sandpit/temp"),
         file:create-temp-file("EXPathFile",".tmp","sandpit/temp")
@@ -898,10 +997,11 @@ This is a "merge".  But should a sub-dir be created or not?
       </all-of>
     </result>
   </test-case>
-  <test-case name="file-createTempDir-001">
+  <test-case name="EXPath-file-createTempDir-001">
     <description>Create temporary directory: in default location</description>
     <created by="John Lumley" on="2013-11-27"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         file:create-temp-dir("EXPathFile",".tmp")
       </test>
@@ -913,10 +1013,11 @@ This is a "merge".  But should a sub-dir be created or not?
       </all-of>
     </result>
   </test-case>
-  <test-case name="file-createTempDir-002">
+  <test-case name="EXPath-file-createTempDir-002">
     <description>Create temporary directory: in defined location</description>
     <created by="John Lumley" on="2013-11-27"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         if (file:exists("sandpit/temp")) then () else file:create-dir("sandpit/temp"),      
         file:create-temp-dir("EXPathFile",".tmp","sandpit/temp")
@@ -930,10 +1031,11 @@ This is a "merge".  But should a sub-dir be created or not?
     </result>
   </test-case>
 
-  <test-case name="file-delete-001">
+  <test-case name="EXPath-file-delete-001">
     <description>Delete simple file</description>
     <created by="Michael Kay" on="2012-06-11"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         if (file:exists("sandpit/dir4")) then () else file:create-dir("sandpit/dir4"),
         file:write-text("sandpit/dir4/test.txt", "test"),
@@ -947,10 +1049,11 @@ This is a "merge".  But should a sub-dir be created or not?
     </result>
   </test-case>
 
-  <test-case name="file-delete-002">
+  <test-case name="EXPath-file-delete-002">
     <description>Delete empty directory</description>
     <created by="Michael Kay" on="2012-06-11"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         if (file:exists("sandpit/dir4")) then file:delete("sandpit/dir4", true()) else (),
         file:create-dir("sandpit/dir4"),
@@ -964,10 +1067,11 @@ This is a "merge".  But should a sub-dir be created or not?
     </result>
   </test-case>
 
-  <test-case name="file-delete-003">
+  <test-case name="EXPath-file-delete-003">
     <description>Delete directory and contents</description>
     <created by="Michael Kay" on="2012-06-11"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         if (file:exists("sandpit/dir4")) then () else file:create-dir("sandpit/dir4/dir5/dir6"),
         file:delete("sandpit/dir4", true())
@@ -980,10 +1084,11 @@ This is a "merge".  But should a sub-dir be created or not?
     </result>
   </test-case>
 
-  <test-case name="file-delete-004">
+  <test-case name="EXPath-file-delete-004">
     <description>Fail to delete non-empty directory</description>
     <created by="Michael Kay" on="2012-06-11"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         if (file:exists("sandpit/dir4")) then () else file:create-dir("sandpit/dir4/dir5/dir6"),
         file:delete("sandpit/dir4", false())
@@ -993,10 +1098,11 @@ This is a "merge".  But should a sub-dir be created or not?
     </result>
   </test-case>
 
-  <test-case name="file-delete-005">
+  <test-case name="EXPath-file-delete-005">
     <description>Fail to delete non-empty directory</description>
     <created by="Michael Kay" on="2012-06-11"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         if (file:exists("sandpit/dir4")) then () 
             else (file:delete("sandpit/dir4", true()), 
@@ -1009,10 +1115,11 @@ This is a "merge".  But should a sub-dir be created or not?
     </result>
   </test-case>
 
-  <test-case name="file-delete-006">
+  <test-case name="EXPath-file-delete-006">
     <description>Delete non-existent file</description>
     <created by="Michael Kay" on="2012-06-11"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         file:delete("sandpit/does-not-exist.txt")
       </test>
@@ -1021,10 +1128,11 @@ This is a "merge".  But should a sub-dir be created or not?
     </result>
   </test-case>
 
-  <test-case name="file-list-001">
+  <test-case name="EXPath-file-list-001">
     <description>List empty directory</description>
     <created by="Michael Kay" on="2012-06-11"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         if (file:exists("sandpit/dir5")) then file:delete("sandpit/dir5", true()) else (),
         file:create-dir("sandpit/dir5"),
@@ -1038,10 +1146,11 @@ This is a "merge".  But should a sub-dir be created or not?
     </result>
   </test-case>
 
-  <test-case name="file-list-002">
+  <test-case name="EXPath-file-list-002">
     <description>List empty directory, recursive = true</description>
     <created by="Michael Kay" on="2012-06-11"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         if (file:exists("sandpit/dir5")) then file:delete("sandpit/dir5", true()) else (),
         file:create-dir("sandpit/dir5"),
@@ -1055,10 +1164,11 @@ This is a "merge".  But should a sub-dir be created or not?
     </result>
   </test-case>
 
-  <test-case name="file-list-003">
+  <test-case name="EXPath-file-list-003">
     <description>List empty directory, recursive = false</description>
     <created by="Michael Kay" on="2012-06-11"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         if (file:exists("sandpit/dir5")) then file:delete("sandpit/dir5", true()) else (),
         file:create-dir("sandpit/dir5"),
@@ -1072,10 +1182,11 @@ This is a "merge".  But should a sub-dir be created or not?
     </result>
   </test-case>
 
-  <test-case name="file-list-004">
+  <test-case name="EXPath-file-list-004">
     <description>List empty directory, recursive = true, with glob</description>
     <created by="Michael Kay" on="2012-06-11"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         if (file:exists("sandpit/dir5")) then file:delete("sandpit/dir5", true()) else (),
         file:create-dir("sandpit/dir5"),
@@ -1089,10 +1200,11 @@ This is a "merge".  But should a sub-dir be created or not?
     </result>
   </test-case>
 
-  <test-case name="file-list-005">
+  <test-case name="EXPath-file-list-005">
     <description>List non-empty directory, recursive = true</description>
     <created by="Michael Kay" on="2012-06-11"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         if (file:exists("sandpit/dir5")) then file:delete("sandpit/dir5", true()) else (),
         file:create-dir("sandpit/dir5"),
@@ -1108,10 +1220,11 @@ This is a "merge".  But should a sub-dir be created or not?
     </result>
   </test-case>
 
-  <test-case name="file-list-006">
+  <test-case name="EXPath-file-list-006">
     <description>List non-empty directory, recursive = false</description>
     <created by="Michael Kay" on="2012-06-11"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         if (file:exists("sandpit/dir5")) then file:delete("sandpit/dir5", true()) else (),
         file:create-dir("sandpit/dir5"),
@@ -1127,10 +1240,11 @@ This is a "merge".  But should a sub-dir be created or not?
     </result>
   </test-case>
 
-  <test-case name="file-list-007">
+  <test-case name="EXPath-file-list-007">
     <description>List non-empty directory, recursive = unspecified</description>
     <created by="Michael Kay" on="2012-06-11"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         if (file:exists("sandpit/dir5")) then file:delete("sandpit/dir5", true()) else (),
         file:create-dir("sandpit/dir5"),
@@ -1146,11 +1260,12 @@ This is a "merge".  But should a sub-dir be created or not?
     </result>
   </test-case>
 
-  <test-case name="file-list-008">
+  <test-case name="EXPath-file-list-008">
     <description>List non-empty directory with subdirectories, recursive = true</description>
     <created by="Michael Kay" on="2012-06-11"/>
     <modified by="Christian Grün" on="2013-11-20" change="Aligned with latest spec (20131120)"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         if (file:exists("sandpit/dir5")) then file:delete("sandpit/dir5", true()) else (),
         file:create-dir("sandpit/dir5"),
@@ -1171,12 +1286,13 @@ This is a "merge".  But should a sub-dir be created or not?
     </result>
   </test-case>
 
-  <test-case name="file-list-009">
+  <test-case name="EXPath-file-list-009">
     <description>List non-empty directory with subdirectories, recursive = false</description>
     <created by="Michael Kay" on="2012-06-11"/>
     <modified by="Christian Grün" on="2013-11-20"
       change="Alternative added, aligned with latest spec (20131120)"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         if (file:exists("sandpit/dir5")) then file:delete("sandpit/dir5", true()) else (),
         file:create-dir("sandpit/dir5"),
@@ -1195,12 +1311,13 @@ This is a "merge".  But should a sub-dir be created or not?
     </result>
   </test-case>
 
-  <test-case name="file-list-010">
+  <test-case name="EXPath-file-list-010">
     <description>List non-empty directory with subdirectories, recursive = unspecified</description>
     <created by="Michael Kay" on="2012-06-11"/>
     <modified by="Christian Grün" on="2013-11-20"
       change="Alternative added, aligned with latest spec (20131120)"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         if (file:exists("sandpit/dir5")) then file:delete("sandpit/dir5", true()) else (),
         file:create-dir("sandpit/dir5"),
@@ -1219,10 +1336,11 @@ This is a "merge".  But should a sub-dir be created or not?
     </result>
   </test-case>
 
-  <test-case name="file-list-011">
+  <test-case name="EXPath-file-list-011">
     <description>List applied to non- directory</description>
     <created by="Michael Kay" on="2012-06-11"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         if (file:exists("sandpit/dir5")) then file:delete("sandpit/dir5", true()) else (),
         file:create-dir("sandpit/dir5"),
@@ -1234,10 +1352,11 @@ This is a "merge".  But should a sub-dir be created or not?
     </result>
   </test-case>
 
-  <test-case name="file-list-012">
+  <test-case name="EXPath-file-list-012">
     <description>List applied to non-existent path</description>
     <created by="Michael Kay" on="2012-06-11"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         if (file:exists("sandpit/dir5")) then file:delete("sandpit/dir5", true()) else (),
         file:create-dir("sandpit/dir5"),
@@ -1249,12 +1368,13 @@ This is a "merge".  But should a sub-dir be created or not?
     </result>
   </test-case>
 
-  <test-case name="file-list-013">
+  <test-case name="EXPath-file-list-013">
     <description>List non-empty directory with subdirectories, recursive = true, with
       glob</description>
     <created by="Michael Kay" on="2012-06-11"/>
     <modified by="Christian Grün" on="2013-11-20" change="Alternative added"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         if (file:exists("sandpit/dir5")) then file:delete("sandpit/dir5", true()) else (),
         file:create-dir("sandpit/dir5"),
@@ -1274,11 +1394,12 @@ This is a "merge".  But should a sub-dir be created or not?
     </result>
   </test-case>
 
-  <test-case name="file-list-014">
+  <test-case name="EXPath-file-list-014">
     <description>List non-empty directory with subdirectories, recursive = true, with
       glob</description>
     <created by="Michael Kay" on="2012-06-11"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         if (file:exists("sandpit/dir5")) then file:delete("sandpit/dir5", true()) else (),
         file:create-dir("sandpit/dir5"),
@@ -1296,12 +1417,13 @@ This is a "merge".  But should a sub-dir be created or not?
     </result>
   </test-case>
 
-  <test-case name="file-list-015">
+  <test-case name="EXPath-file-list-015">
     <description>List non-empty directory with subdirectories, recursive = true, with
       glob</description>
     <created by="Michael Kay" on="2012-06-11"/>
     <modified by="Christian Grün" on="2013-11-20" change="Alternative added"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         if (file:exists("sandpit/dir5")) then file:delete("sandpit/dir5", true()) else (),
         file:create-dir("sandpit/dir5"),
@@ -1320,12 +1442,13 @@ This is a "merge".  But should a sub-dir be created or not?
     </result>
   </test-case>
 
-  <test-case name="file-list-016">
+  <test-case name="EXPath-file-list-016">
     <description>List non-empty directory with subdirectories, recursive = true, with
       glob</description>
     <created by="Michael Kay" on="2012-06-11"/>
     <modified by="Christian Grün" on="2013-11-20" change="Alternative added"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         if (file:exists("sandpit/dir5")) then file:delete("sandpit/dir5", true()) else (),
         file:create-dir("sandpit/dir5"),
@@ -1344,12 +1467,13 @@ This is a "merge".  But should a sub-dir be created or not?
     </result>
   </test-case>
 
-  <test-case name="file-list-017">
+  <test-case name="EXPath-file-list-017">
     <description>List non-empty directory with subdirectories, recursive = true, with
       glob</description>
     <created by="Michael Kay" on="2012-06-11"/>
     <modified by="Christian Grün" on="2013-11-20" change="Alternative added"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         if (file:exists("sandpit/dir5")) then file:delete("sandpit/dir5", true()) else (),
         file:create-dir("sandpit/dir5"),
@@ -1370,10 +1494,11 @@ This is a "merge".  But should a sub-dir be created or not?
     </result>
   </test-case>
 
-  <test-case name="file-list-018">
+  <test-case name="EXPath-file-list-018">
     <description>List contents of current directory</description>
     <created by="Michael Kay" on="2012-06-11"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         exists(file:list("."))
       </test>
@@ -1382,10 +1507,11 @@ This is a "merge".  But should a sub-dir be created or not?
     </result>
   </test-case>
 
-  <test-case name="file-list-019">
+  <test-case name="EXPath-file-list-019">
     <description>List contents of parent of current directory</description>
     <created by="Michael Kay" on="2012-06-11"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         exists(file:list(".."))
       </test>
@@ -1394,10 +1520,11 @@ This is a "merge".  But should a sub-dir be created or not?
     </result>
   </test-case>
 
-  <test-case name="file-move-001">
+  <test-case name="EXPath-file-move-001">
     <description>file:move existing file, overwriting existing file</description>
     <created by="Michael Kay" on="2012-06-11"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         file:write-text("sandpit/source.txt", "defenestration"),
         file:write-text("sandpit/target.txt", "prague"),
@@ -1413,10 +1540,11 @@ This is a "merge".  But should a sub-dir be created or not?
     </result>
   </test-case>
 
-  <test-case name="file-move-002">
+  <test-case name="EXPath-file-move-002">
     <description>file:move existing file, creating target file</description>
     <created by="Michael Kay" on="2012-06-11"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         file:write-text("sandpit/source.txt", "treaty"),
         file:delete("sandpit/target.txt"),
@@ -1431,10 +1559,11 @@ This is a "merge".  But should a sub-dir be created or not?
     </result>
   </test-case>
 
-  <test-case name="file-move-003">
+  <test-case name="EXPath-file-move-003">
     <description>file:move existing file, creating target file in specified directory</description>
     <created by="Michael Kay" on="2012-06-11"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         file:write-text("sandpit/source.txt", "persecution"),
         if (file:exists("sandpit/dir2")) then file:delete("sandpit/dir2", true()) else (),
@@ -1452,10 +1581,11 @@ This is a "merge".  But should a sub-dir be created or not?
     </result>
   </test-case>
 
-  <test-case name="file-move-004">
+  <test-case name="EXPath-file-move-004">
     <description>file:move used to move a directory, target directory does not exist</description>
     <created by="Michael Kay" on="2012-06-11"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         if (file:exists("sandpit/dirsource")) then file:delete("sandpit/dirsource", true()) else (),
         if (file:exists("sandpit/dirtarget")) then file:delete("sandpit/dirtarget", true()) else (),
@@ -1477,11 +1607,12 @@ This is a "merge".  But should a sub-dir be created or not?
     </result>
   </test-case>
 
-  <test-case name="file-move-005">
+  <test-case name="EXPath-file-move-005">
     <description>file:move used to move a directory, target directory exists</description>
     <created by="Michael Kay" on="2012-06-11"/>
     <modified by="Christian Grün" on="2013-11-20" change="Aligned with latest spec (20131120)"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         if (file:exists("sandpit/dirsource")) then file:delete("sandpit/dirsource", true()) else (),
         if (file:exists("sandpit/dirtarget")) then file:delete("sandpit/dirtarget", true()) else (),
@@ -1507,10 +1638,11 @@ This is a "merge".  But should a sub-dir be created or not?
     </result>
   </test-case>
 
-  <test-case name="file-readBinary-001">
+  <test-case name="EXPath-file-readBinary-001">
     <description>Use file:read-binary on binary data</description>
     <created by="Michael Kay" on="2012-06-11"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         (if (file:exists("sandpit/test.bin")) 
           then file:delete("sandpit/test.bin")
@@ -1524,10 +1656,11 @@ This is a "merge".  But should a sub-dir be created or not?
     </result>
   </test-case>
 
-  <test-case name="file-readBinary-002">
+  <test-case name="EXPath-file-readBinary-002">
     <description>Use file:read-binary on text data</description>
     <created by="Michael Kay" on="2012-06-11"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         (if (file:exists("sandpit/test.bin")) 
           then file:delete("sandpit/test.bin")
@@ -1541,10 +1674,11 @@ This is a "merge".  But should a sub-dir be created or not?
     </result>
   </test-case>
 
-  <test-case name="file-readBinary-003">
+  <test-case name="EXPath-file-readBinary-003">
     <description>Use file:read-binary, file does not exist</description>
     <created by="Michael Kay" on="2012-06-11"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         (if (file:exists("sandpit/test.bin")) 
           then file:delete("sandpit/test.bin")
@@ -1556,10 +1690,11 @@ This is a "merge".  But should a sub-dir be created or not?
     </result>
   </test-case>
 
-  <test-case name="file-readBinary-004">
+  <test-case name="EXPath-file-readBinary-004">
     <description>Use file:read-binary, file is directory</description>
     <created by="Michael Kay" on="2012-06-11"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         (if (file:exists("sandpit/test.bin")) 
           then file:delete("sandpit/test.bin")
@@ -1571,10 +1706,11 @@ This is a "merge".  But should a sub-dir be created or not?
     </result>
   </test-case>
 
-  <test-case name="file-readBinary2-001">
+  <test-case name="EXPath-file-readBinary2-001">
     <description>Use file:read-binary with zero offset</description>
     <created by="John Lumley" on="2013-12-02"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         (if (file:exists("sandpit/test.bin")) 
           then file:delete("sandpit/test.bin")
@@ -1587,10 +1723,11 @@ This is a "merge".  But should a sub-dir be created or not?
       </all-of>
     </result>
   </test-case>
-  <test-case name="file-readBinary2-002">
+  <test-case name="EXPath-file-readBinary2-002">
     <description>Use file:read-binary with non-zero offset</description>
     <created by="John Lumley" on="2013-12-02"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         (if (file:exists("sandpit/test.bin")) 
           then file:delete("sandpit/test.bin")
@@ -1603,10 +1740,11 @@ This is a "merge".  But should a sub-dir be created or not?
       </all-of>
     </result>
   </test-case>
-  <test-case name="file-readBinary2-003">
+  <test-case name="EXPath-file-readBinary2-003">
     <description>Use file:read-binary with negative offset</description>
     <created by="John Lumley" on="2013-12-02"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         (if (file:exists("sandpit/test.bin")) 
           then file:delete("sandpit/test.bin")
@@ -1619,10 +1757,11 @@ This is a "merge".  But should a sub-dir be created or not?
       </all-of>
     </result>
   </test-case>
-  <test-case name="file-readBinary3-001">
+  <test-case name="EXPath-file-readBinary3-001">
     <description>Use file:read-binary with negative length</description>
     <created by="John Lumley" on="2013-12-02"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         (if (file:exists("sandpit/test.bin")) 
           then file:delete("sandpit/test.bin")
@@ -1635,10 +1774,11 @@ This is a "merge".  But should a sub-dir be created or not?
       </all-of>
     </result>
   </test-case>
-  <test-case name="file-readBinary3-002">
+  <test-case name="EXPath-file-readBinary3-002">
     <description>Use file:read-binary with non-zero offset and length</description>
     <created by="John Lumley" on="2013-12-02"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         (if (file:exists("sandpit/test.bin")) 
           then file:delete("sandpit/test.bin")
@@ -1651,10 +1791,11 @@ This is a "merge".  But should a sub-dir be created or not?
       </all-of>
     </result>
   </test-case>
-  <test-case name="file-readBinary3-003">
+  <test-case name="EXPath-file-readBinary3-003">
     <description>Use file:read-binary with non-zero offset beyond bounds</description>
     <created by="John Lumley" on="2013-12-02"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         (if (file:exists("sandpit/test.bin")) 
           then file:delete("sandpit/test.bin")
@@ -1667,10 +1808,11 @@ This is a "merge".  But should a sub-dir be created or not?
       </all-of>
     </result>
   </test-case>
-  <test-case name="file-readBinary3-004">
+  <test-case name="EXPath-file-readBinary3-004">
     <description>Use file:read-binary with non-zero offset and length to bounds</description>
     <created by="John Lumley" on="2013-12-02"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         (if (file:exists("sandpit/test.bin")) 
           then file:delete("sandpit/test.bin")
@@ -1683,10 +1825,11 @@ This is a "merge".  But should a sub-dir be created or not?
       </all-of>
     </result>
   </test-case>
-  <test-case name="file-readBinary3-005">
+  <test-case name="EXPath-file-readBinary3-005">
     <description>Use file:read-binary with non-zero offset and length beyond bounds</description>
     <created by="John Lumley" on="2013-12-02"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         (if (file:exists("sandpit/test.bin")) 
           then file:delete("sandpit/test.bin")
@@ -1701,10 +1844,11 @@ This is a "merge".  But should a sub-dir be created or not?
   </test-case>
 
 
-  <test-case name="file-readText1-001">
+  <test-case name="EXPath-file-readText1-001">
     <description>Use file:read-text with 1 arg</description>
     <created by="Michael Kay" on="2012-06-11"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         (if (file:exists("sandpit/test.txt")) 
           then file:delete("sandpit/test.txt")
@@ -1718,10 +1862,11 @@ This is a "merge".  But should a sub-dir be created or not?
     </result>
   </test-case>
 
-  <test-case name="file-readText1-002">
+  <test-case name="EXPath-file-readText1-002">
     <description>Use file:read-text with 1 arg, file does not exist</description>
     <created by="Michael Kay" on="2012-06-11"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         (if (file:exists("sandpit/test.txt")) 
           then file:delete("sandpit/test.txt")
@@ -1733,10 +1878,11 @@ This is a "merge".  But should a sub-dir be created or not?
     </result>
   </test-case>
 
-  <test-case name="file-readText1-003">
+  <test-case name="EXPath-file-readText1-003">
     <description>Use file:read-text with 1 arg, file is directory</description>
     <created by="Michael Kay" on="2012-06-11"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         (if (file:exists("sandpit/test.txt")) 
           then file:delete("sandpit/test.txt")
@@ -1748,10 +1894,11 @@ This is a "merge".  But should a sub-dir be created or not?
     </result>
   </test-case>
 
-  <test-case name="file-readText2-001">
+  <test-case name="EXPath-file-readText2-001">
     <description>Use file:read-text with 2 args</description>
     <created by="Michael Kay" on="2012-06-11"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         (if (file:exists("sandpit/test.txt")) 
           then file:delete("sandpit/test.txt")
@@ -1765,10 +1912,11 @@ This is a "merge".  But should a sub-dir be created or not?
     </result>
   </test-case>
 
-  <test-case name="file-readText2-002">
+  <test-case name="EXPath-file-readText2-002">
     <description>Use file:read-text with 2 args - nonexistent file</description>
     <created by="Michael Kay" on="2012-06-11"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         (if (file:exists("sandpit/test.txt")) 
           then file:delete("sandpit/test.txt")
@@ -1780,10 +1928,11 @@ This is a "merge".  But should a sub-dir be created or not?
     </result>
   </test-case>
 
-  <test-case name="file-readText2-003">
+  <test-case name="EXPath-file-readText2-003">
     <description>Use file:read-text with 2 args - file is directory</description>
     <created by="Michael Kay" on="2012-06-11"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         (if (file:exists("sandpit/test.txt")) 
           then file:delete("sandpit/test.txt")
@@ -1795,10 +1944,11 @@ This is a "merge".  But should a sub-dir be created or not?
     </result>
   </test-case>
 
-  <test-case name="file-readText2-004">
+  <test-case name="EXPath-file-readText2-004">
     <description>Use file:read-text with 2 args - invalid encoding</description>
     <created by="Michael Kay" on="2012-06-11"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         (if (file:exists("sandpit/test.txt")) 
           then file:delete("sandpit/test.txt")
@@ -1810,10 +1960,11 @@ This is a "merge".  But should a sub-dir be created or not?
     </result>
   </test-case>
 
-  <test-case name="file-readText2-005">
+  <test-case name="EXPath-file-readText2-005">
     <description>Use file:read-text with 2 args - incorrect encoding</description>
     <created by="Michael Kay" on="2012-06-11"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         (if (file:exists("sandpit/test.txt")) 
           then file:delete("sandpit/test.txt")
@@ -1827,10 +1978,11 @@ This is a "merge".  But should a sub-dir be created or not?
   </test-case>
 
 
-  <test-case name="file-readTextLines1-001">
+  <test-case name="EXPath-file-readTextLines1-001">
     <description>Use file:read-textlines with 1 arg: xA as newline</description>
     <created by="Michael Kay" on="2012-06-11"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         (if (file:exists("sandpit/test.txt")) 
           then file:delete("sandpit/test.txt")
@@ -1844,10 +1996,11 @@ This is a "merge".  But should a sub-dir be created or not?
     </result>
   </test-case>
 
-  <test-case name="file-readTextLines1-002">
+  <test-case name="EXPath-file-readTextLines1-002">
     <description>Use file:read-textlines with 1 arg: xD as newline</description>
     <created by="Michael Kay" on="2012-06-11"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         (if (file:exists("sandpit/test.txt")) 
           then file:delete("sandpit/test.txt")
@@ -1861,10 +2014,11 @@ This is a "merge".  But should a sub-dir be created or not?
     </result>
   </test-case>
 
-  <test-case name="file-readTextLines1-003">
+  <test-case name="EXPath-file-readTextLines1-003">
     <description>Use file:read-textlines with 1 arg: xDxA as newline</description>
     <created by="Michael Kay" on="2012-06-11"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         (if (file:exists("sandpit/test.txt")) 
           then file:delete("sandpit/test.txt")
@@ -1878,10 +2032,11 @@ This is a "merge".  But should a sub-dir be created or not?
     </result>
   </test-case>
 
-  <test-case name="file-readTextLines1-004">
+  <test-case name="EXPath-file-readTextLines1-004">
     <description>Use file:read-textlines with 1 arg: xA as newline</description>
     <created by="Michael Kay" on="2012-06-11"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         (if (file:exists("sandpit/test.txt")) 
           then file:delete("sandpit/test.txt")
@@ -1895,10 +2050,11 @@ This is a "merge".  But should a sub-dir be created or not?
     </result>
   </test-case>
 
-  <test-case name="file-readTextLines1-005">
+  <test-case name="EXPath-file-readTextLines1-005">
     <description>Use file:read-textlines with 1 arg: xD as newline</description>
     <created by="Michael Kay" on="2012-06-11"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         (if (file:exists("sandpit/test.txt")) 
           then file:delete("sandpit/test.txt")
@@ -1912,10 +2068,11 @@ This is a "merge".  But should a sub-dir be created or not?
     </result>
   </test-case>
 
-  <test-case name="file-readTextLines1-006">
+  <test-case name="EXPath-file-readTextLines1-006">
     <description>Use file:read-textlines with 1 arg: xDxA as newline</description>
     <created by="Michael Kay" on="2012-06-11"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         (if (file:exists("sandpit/test.txt")) 
           then file:delete("sandpit/test.txt")
@@ -1929,10 +2086,13 @@ This is a "merge".  But should a sub-dir be created or not?
     </result>
   </test-case>
 
-  <test-case name="file-readTextLines1-007">
+  <test-case name="EXPath-file-readTextLines1-007">
     <description>Use file:read-textlines with 1 arg: xAxD as newline</description>
     <created by="Michael Kay" on="2012-06-11"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <modified by="John Lumley" on="2014-08-14" change="Added another possibility for MS-DOS environments. 
+      Note that the LF;CR;(blank)LF;CR combination counts the middle CR;LF as a single line break."/>
+    <environment ref="EXPath-file"/>
     <test>
         (if (file:exists("sandpit/test.txt")) 
           then file:delete("sandpit/test.txt")
@@ -1940,16 +2100,18 @@ This is a "merge".  But should a sub-dir be created or not?
         file:write-text("sandpit/test.txt", string-join(("abcd", "defg", "", "hijk"), "&#xa;&#xd;")),
         file:read-text-lines("sandpit/test.txt")</test>
     <result>
-      <all-of>
+      <any-of>
         <assert-deep-eq>"abcd", "", "defg", "", "", "", "hijk"</assert-deep-eq>
-      </all-of>
+        <assert-deep-eq>"abcd", "", "defg", "", "", "hijk"</assert-deep-eq>
+      </any-of>
     </result>
   </test-case>
 
-  <test-case name="file-readTextLines1-008">
+  <test-case name="EXPath-file-readTextLines1-008">
     <description>Use file:read-textlines with 1 arg: empty file</description>
     <created by="Michael Kay" on="2012-06-11"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         (if (file:exists("sandpit/test.txt")) 
           then file:delete("sandpit/test.txt")
@@ -1963,10 +2125,11 @@ This is a "merge".  But should a sub-dir be created or not?
     </result>
   </test-case>
 
-  <test-case name="file-readTextLines1-009">
+  <test-case name="EXPath-file-readTextLines1-009">
     <description>Use file:read-textlines with 1 arg: non-existent file</description>
     <created by="Michael Kay" on="2012-06-11"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         (if (file:exists("sandpit/test.txt")) 
           then file:delete("sandpit/test.txt")
@@ -1977,10 +2140,11 @@ This is a "merge".  But should a sub-dir be created or not?
     </result>
   </test-case>
 
-  <test-case name="file-readTextLines1-010">
+  <test-case name="EXPath-file-readTextLines1-010">
     <description>Use file:read-textlines with 1 arg: input is directory</description>
     <created by="Michael Kay" on="2012-06-11"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         file:read-text-lines("sandpit")</test>
     <result>
@@ -1988,10 +2152,11 @@ This is a "merge".  But should a sub-dir be created or not?
     </result>
   </test-case>
 
-  <test-case name="file-readTextLines1-011">
+  <test-case name="EXPath-file-readTextLines1-011">
     <description>Use file:read-textlines with 2 args: non-existent file</description>
     <created by="Michael Kay" on="2012-06-11"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         (if (file:exists("sandpit/test.txt")) 
           then file:delete("sandpit/test.txt")
@@ -2002,10 +2167,11 @@ This is a "merge".  But should a sub-dir be created or not?
     </result>
   </test-case>
 
-  <test-case name="file-readTextLines1-012">
+  <test-case name="EXPath-file-readTextLines1-012">
     <description>Use file:read-textlines with 2 args: input is directory</description>
     <created by="Michael Kay" on="2012-06-11"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         file:read-text-lines("sandpit", "UTF-8")</test>
     <result>
@@ -2013,12 +2179,13 @@ This is a "merge".  But should a sub-dir be created or not?
     </result>
   </test-case>
 
-  <test-case name="file-readTextLines1-013">
+  <test-case name="EXPath-file-readTextLines1-013">
     <description>Use file:read-textlines with 2 args: unknown encoding</description>
     <created by="Michael Kay" on="2012-06-11"/>
     <modified by="John Lumley" on="2013-12-02"
-      change="Corrected read to read from sandpit/test.txt not sandpit"/>
-    <environment ref="file"/>
+      change="Corrected read to extract from sandpit/test.txt not sandpit"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         (if (file:exists("sandpit/test.txt")) 
           then file:delete("sandpit/test.txt")
@@ -2030,10 +2197,11 @@ This is a "merge".  But should a sub-dir be created or not?
     </result>
   </test-case>
 
-  <test-case name="file-readTextLines1-014">
+  <test-case name="EXPath-file-readTextLines1-014">
     <description>Use file:read-textlines with 1 arg: xA as newline</description>
     <created by="Michael Kay" on="2012-06-11"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         (if (file:exists("sandpit/test.txt")) 
           then file:delete("sandpit/test.txt")
@@ -2049,11 +2217,12 @@ This is a "merge".  But should a sub-dir be created or not?
     </result>
   </test-case>
 
-  <test-case name="file-readTextLines1-015">
+  <test-case name="EXPath-file-readTextLines1-015">
     <description>Use file:read-textlines with 1 arg: file contents invalid for chosen
       encoding</description>
     <created by="Michael Kay" on="2012-06-11"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         (if (file:exists("sandpit/test.txt")) 
           then file:delete("sandpit/test.txt")
@@ -2066,10 +2235,11 @@ This is a "merge".  But should a sub-dir be created or not?
     </result>
   </test-case>
 
-  <test-case name="file-writeText2-001">
+  <test-case name="EXPath-file-writeText2-001">
     <description>Use file:write-text with two arguments</description>
     <created by="Michael Kay" on="2012-06-11"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         (if (file:exists("sandpit/test.txt")) 
           then file:delete("sandpit/test.txt")
@@ -2083,10 +2253,11 @@ This is a "merge".  But should a sub-dir be created or not?
     </result>
   </test-case>
 
-  <test-case name="file-writeText2-002">
+  <test-case name="EXPath-file-writeText2-002">
     <description>Use file:write-text writing to an existing file</description>
     <created by="Michael Kay" on="2012-06-11"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>file:write-text("sandpit/test.txt", "def")</test>
     <result>
       <all-of>
@@ -2096,10 +2267,11 @@ This is a "merge".  But should a sub-dir be created or not?
     </result>
   </test-case>
 
-  <test-case name="file-writeText2-003">
+  <test-case name="EXPath-file-writeText2-003">
     <description>Use file:write-text writing empty string</description>
     <created by="Michael Kay" on="2012-06-11"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>file:write-text("sandpit/test.txt", "")</test>
     <result>
       <all-of>
@@ -2109,10 +2281,11 @@ This is a "merge".  But should a sub-dir be created or not?
     </result>
   </test-case>
 
-  <test-case name="file-writeText2-004">
+  <test-case name="EXPath-file-writeText2-004">
     <description>Use file:write-text : default encoding is UTF-8</description>
     <created by="Michael Kay" on="2012-06-11"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>file:write-text("sandpit/test.txt", "&#xa3;")</test>
     <result>
       <all-of>
@@ -2123,10 +2296,11 @@ This is a "merge".  But should a sub-dir be created or not?
     </result>
   </test-case>
 
-  <test-case name="file-writeText2-005">
+  <test-case name="EXPath-file-writeText2-005">
     <description>Use file:write-text with two arguments: file is a directory</description>
     <created by="Michael Kay" on="2012-06-11"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         file:write-text("sandpit", "abc")</test>
     <result>
@@ -2134,11 +2308,12 @@ This is a "merge".  But should a sub-dir be created or not?
     </result>
   </test-case>
 
-  <test-case name="file-writeText2-006">
+  <test-case name="EXPath-file-writeText2-006">
     <description>Use file:write-text with two arguments: attempt to create file in non-existent
       directory</description>
     <created by="Michael Kay" on="2012-06-11"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         file:write-text("nonexistent/file.xml", "abc")</test>
     <result>
@@ -2146,10 +2321,11 @@ This is a "merge".  But should a sub-dir be created or not?
     </result>
   </test-case>
 
-  <test-case name="file-writeText3-001">
+  <test-case name="EXPath-file-writeText3-001">
     <description>Use file:write-text with three arguments, UTF-8</description>
     <created by="Michael Kay" on="2012-06-11"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         (if (file:exists("sandpit/test2.txt")) 
           then file:delete("sandpit/test2.txt")
@@ -2166,10 +2342,11 @@ This is a "merge".  But should a sub-dir be created or not?
     </result>
   </test-case>
 
-  <test-case name="file-writeText3-002">
+  <test-case name="EXPath-file-writeText3-002">
     <description>Use file:write-text with three arguments: UTF-16 encoding</description>
     <created by="Michael Kay" on="2012-06-11"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         (if (file:exists("sandpit/test3.txt")) 
           then file:delete("sandpit/test3.txt")
@@ -2184,10 +2361,11 @@ This is a "merge".  But should a sub-dir be created or not?
     </result>
   </test-case>
 
-  <test-case name="file-writeText3-003">
+  <test-case name="EXPath-file-writeText3-003">
     <description>Use file:write-text with three arguments: unsupported encoding</description>
     <created by="Michael Kay" on="2012-06-11"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         (if (file:exists("sandpit/test4.txt")) 
           then file:delete("sandpit/test4.txt")
@@ -2198,10 +2376,11 @@ This is a "merge".  But should a sub-dir be created or not?
     </result>
   </test-case>
 
-  <test-case name="file-writeText3-004">
+  <test-case name="EXPath-file-writeText3-004">
     <description>Use file:write-text with three arguments: file is a directory</description>
     <created by="Michael Kay" on="2012-06-11"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         file:write-text("sandpit", "abc", "UTF-8")</test>
     <result>
@@ -2209,11 +2388,12 @@ This is a "merge".  But should a sub-dir be created or not?
     </result>
   </test-case>
 
-  <test-case name="file-writeText3-005">
+  <test-case name="EXPath-file-writeText3-005">
     <description>Use file:write-text with three arguments: attempt to create file in non-existent
       directory</description>
     <created by="Michael Kay" on="2012-06-11"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         file:write-text("nonexistent/file.xml", "abc", "UTF-8")</test>
     <result>
@@ -2221,10 +2401,11 @@ This is a "merge".  But should a sub-dir be created or not?
     </result>
   </test-case>
 
-  <test-case name="file-writeBinary2-001">
+  <test-case name="EXPath-file-writeBinary2-001">
     <description>Use file:write-binary with two arguments</description>
     <created by="Michael Kay" on="2012-06-11"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         (if (file:exists("sandpit/test.bin")) 
           then file:delete("sandpit/test.bin")
@@ -2240,10 +2421,11 @@ This is a "merge".  But should a sub-dir be created or not?
     </result>
   </test-case>
 
-  <test-case name="file-writeBinary2-002">
+  <test-case name="EXPath-file-writeBinary2-002">
     <description>Use file:write-binary with two arguments, overwrite existing file</description>
     <created by="Michael Kay" on="2012-06-11"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         file:write-binary("sandpit/test.bin", 
            xs:base64Binary(xs:hexBinary("0506")))
@@ -2257,10 +2439,11 @@ This is a "merge".  But should a sub-dir be created or not?
     </result>
   </test-case>
 
-  <test-case name="file-writeBinary2-003">
+  <test-case name="EXPath-file-writeBinary2-003">
     <description>Use file:write-binary with two arguments: file is a directory</description>
     <created by="Michael Kay" on="2012-06-11"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         file:write-binary("sandpit", xs:base64Binary(""))
       </test>
@@ -2269,11 +2452,12 @@ This is a "merge".  But should a sub-dir be created or not?
     </result>
   </test-case>
 
-  <test-case name="file-writeBinary2-004">
+  <test-case name="EXPath-file-writeBinary2-004">
     <description>Use file:write-binary with two arguments: attempt to create file in non-existent
       directory</description>
     <created by="Michael Kay" on="2012-06-11"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         file:write-binary("nonexistent/file.bin", xs:base64Binary(""))
       </test>
@@ -2282,10 +2466,11 @@ This is a "merge".  But should a sub-dir be created or not?
     </result>
   </test-case>
 
-  <test-case name="file-writeBinary3-001">
+  <test-case name="EXPath-file-writeBinary3-001">
     <description>Use file:write-binary with three arguments, file does not exist</description>
     <created by="John Lumley" on="2013-12-02"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         (if (file:exists("sandpit/test.bin")) 
           then file:delete("sandpit/test.bin")
@@ -2300,10 +2485,11 @@ This is a "merge".  But should a sub-dir be created or not?
       </all-of>
     </result>
   </test-case>
-  <test-case name="file-writeBinary3-002">
+  <test-case name="EXPath-file-writeBinary3-002">
     <description>Use file:write-binary with three arguments, file already exists</description>
     <created by="John Lumley" on="2013-12-02"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         (if (file:exists("sandpit/test.bin")) 
           then file:delete("sandpit/test.bin")
@@ -2319,10 +2505,11 @@ This is a "merge".  But should a sub-dir be created or not?
       </all-of>
     </result>
   </test-case>
-  <test-case name="file-writeBinary3-003">
+  <test-case name="EXPath-file-writeBinary3-003">
     <description>Use file:write-binary with three arguments: negative offset</description>
     <created by="John Lumley" on="2013-12-02"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         (if (file:exists("sandpit/test.bin")) 
           then file:delete("sandpit/test.bin")
@@ -2335,11 +2522,12 @@ This is a "merge".  But should a sub-dir be created or not?
       </all-of>
     </result>
   </test-case>
-  <test-case name="file-writeBinary3-004">
-    <description>Use file:write-binary with three arguments: offset beyond end of exisiting
+  <test-case name="EXPath-file-writeBinary3-004">
+    <description>Use file:write-binary with three arguments: offset beyond end of existing
       file</description>
     <created by="John Lumley" on="2013-12-02"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         (if (file:exists("sandpit/test.bin")) 
           then file:delete("sandpit/test.bin")
@@ -2353,10 +2541,11 @@ This is a "merge".  But should a sub-dir be created or not?
       </all-of>
     </result>
   </test-case>
-  <test-case name="file-writeBinary3-005">
+  <test-case name="EXPath-file-writeBinary3-005">
     <description>Use file:write-binary with three arguments, file already exists, offset just before end</description>
     <created by="John Lumley" on="2013-12-02"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         (if (file:exists("sandpit/test.bin")) 
           then file:delete("sandpit/test.bin")
@@ -2372,10 +2561,11 @@ This is a "merge".  But should a sub-dir be created or not?
       </all-of>
     </result>
   </test-case>
-  <test-case name="file-writeBinary3-005">
+  <test-case name="EXPath-file-writeBinary3-005">
     <description>Use file:write-binary with three arguments, file already exists, offset just at end</description>
     <created by="John Lumley" on="2013-12-02"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         (if (file:exists("sandpit/test.bin")) 
           then file:delete("sandpit/test.bin")
@@ -2392,10 +2582,11 @@ This is a "merge".  But should a sub-dir be created or not?
     </result>
   </test-case>
 
-  <test-case name="file-name1-001">
+  <test-case name="EXPath-file-name1-001">
     <description>Use file:name on a text file</description>
     <created by="John Lumley" on="2013-12-02"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         (if (file:exists("sandpit/test.txt")) 
           then file:delete("sandpit/test.txt")
@@ -2407,10 +2598,11 @@ This is a "merge".  But should a sub-dir be created or not?
       <assert-eq>"test.txt"</assert-eq>
     </result>
   </test-case>
-  <test-case name="file-name1-002">
+  <test-case name="EXPath-file-name1-002">
     <description>Use file:name on a directory</description>
     <created by="John Lumley" on="2013-12-02"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         file:name("sandpit")
       </test>
@@ -2418,10 +2610,11 @@ This is a "merge".  But should a sub-dir be created or not?
       <assert-eq>"sandpit"</assert-eq>
     </result>
   </test-case>
-  <test-case name="file-name1-003">
+  <test-case name="EXPath-file-name1-003">
     <description>Use file:name on a nonexistent file</description>
     <created by="John Lumley" on="2013-12-02"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         file:name("sandpit/nonexistent.txt")
       </test>
@@ -2429,10 +2622,11 @@ This is a "merge".  But should a sub-dir be created or not?
       <assert-eq>"nonexistent.txt"</assert-eq>
     </result>
   </test-case>
-  <test-case name="file-name1-004">
+  <test-case name="EXPath-file-name1-004">
     <description>Use file:name on current directory</description>
     <created by="John Lumley" on="2013-12-02"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         file:name(".")
     </test>
@@ -2441,10 +2635,11 @@ This is a "merge".  But should a sub-dir be created or not?
       <assert-eq>'Fred'</assert-eq>
     </result>
   </test-case>
-  <test-case name="file-name1-005">
+  <test-case name="EXPath-file-name1-005">
     <description>Use file:name on path with trailing separator</description>
     <created by="John Lumley" on="2013-12-02"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         file:name("sandpit/dir1/")
       </test>
@@ -2452,10 +2647,11 @@ This is a "merge".  But should a sub-dir be created or not?
       <assert-eq>"dir1"</assert-eq>
     </result>
   </test-case>
-  <test-case name="file-name1-006">
+  <test-case name="EXPath-file-name1-006">
     <description>Use file:name on root path</description>
     <created by="John Lumley" on="2013-12-02"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         file:name("/")
       </test>
@@ -2463,10 +2659,11 @@ This is a "merge".  But should a sub-dir be created or not?
       <assert-eq>""</assert-eq>
     </result>
   </test-case>
-  <test-case name="file-name1-007">
+  <test-case name="EXPath-file-name1-007">
     <description>Use file:name on empty path</description>
     <created by="John Lumley" on="2013-12-02"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         file:name("")
       </test>
@@ -2475,10 +2672,11 @@ This is a "merge".  But should a sub-dir be created or not?
     </result>
   </test-case>
 
-  <test-case name="file-parent-001">
+  <test-case name="EXPath-file-parent-001">
     <description>Use file:parent on a text file</description>
     <created by="John Lumley" on="2013-12-02"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         (if (file:exists("sandpit/test.txt")) 
           then file:delete("sandpit/test.txt")
@@ -2493,10 +2691,11 @@ This is a "merge".  But should a sub-dir be created or not?
       </any-of>      
     </result>
   </test-case>
-  <test-case name="file-parent-002">
+  <test-case name="EXPath-file-parent-002">
     <description>Use file:parent on a directory</description>
     <created by="John Lumley" on="2013-12-02"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         file:parent("sandpit/dir1")
     </test>
@@ -2507,10 +2706,11 @@ This is a "merge".  But should a sub-dir be created or not?
       </any-of> 
     </result>
   </test-case>
-  <test-case name="file-parent-003">
+  <test-case name="EXPath-file-parent-003">
     <description>Use file:parent on a directory ignoring trailing slash</description>
     <created by="John Lumley" on="2013-12-02"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         file:parent("sandpit/dir1/")
     </test>
@@ -2521,10 +2721,11 @@ This is a "merge".  But should a sub-dir be created or not?
       </any-of> 
     </result>
   </test-case>
-  <test-case name="file-parent-004">
+  <test-case name="EXPath-file-parent-004">
     <description>Use file:parent on root</description>
     <created by="John Lumley" on="2013-12-02"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         file:parent("/")
     </test>
@@ -2533,10 +2734,11 @@ This is a "merge".  But should a sub-dir be created or not?
     </result>
   </test-case>
 
-  <test-case name="file-pathToNative-001">
+  <test-case name="EXPath-file-pathToNative-001">
     <description>Use file:path-to-native on a text file</description>
     <created by="Michael Kay" on="2012-06-11"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         file:path-to-native("sandpit/test.txt")
       </test>
@@ -2548,10 +2750,11 @@ This is a "merge".  But should a sub-dir be created or not?
     </result>
   </test-case>
 
-  <test-case name="file-pathToNative-002">
+  <test-case name="EXPath-file-pathToNative-002">
     <description>Use file:path-to-native on a text file, multiple slashes</description>
     <created by="Michael Kay" on="2012-06-11"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
          file:path-to-native("sandpit///test.txt")
       </test>
@@ -2563,10 +2766,11 @@ This is a "merge".  But should a sub-dir be created or not?
     </result>
   </test-case>
 
-  <test-case name="file-pathToNative-003">
+  <test-case name="EXPath-file-pathToNative-003">
     <description>Use file:path-to-native on a text file, redundant component</description>
     <created by="Michael Kay" on="2012-06-11"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
          file:path-to-native("sandpit/./test.txt")
       </test>
@@ -2578,10 +2782,11 @@ This is a "merge".  But should a sub-dir be created or not?
     </result>
   </test-case>
 
-  <test-case name="file-pathToNative-004">
+  <test-case name="EXPath-file-pathToNative-004">
     <description>Use file:path-to-native on a text file, removal of file:/// part</description>
     <created by="Michael Kay" on="2012-06-11"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
          file:path-to-native("file:///test.dir")
       </test>
@@ -2590,10 +2795,11 @@ This is a "merge".  But should a sub-dir be created or not?
     </result>
   </test-case>
 
-  <test-case name="file-pathToNative-005">
+  <test-case name="EXPath-file-pathToNative-005">
     <description>Use file:path-to-native on a text file, removal of file:/// part</description>
     <created by="Michael Kay" on="2012-06-11"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
          file:path-to-native(".")
       </test>
@@ -2602,10 +2808,11 @@ This is a "merge".  But should a sub-dir be created or not?
     </result>
   </test-case>
 
-  <test-case name="file-pathToUri-001">
+  <test-case name="EXPath-file-pathToUri-001">
     <description>Use file:path-to-uri on a text file</description>
     <created by="Michael Kay" on="2012-06-11"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         file:path-to-uri("sandpit/test.txt")
       </test>
@@ -2616,11 +2823,26 @@ This is a "merge".  But should a sub-dir be created or not?
       </all-of>
     </result>
   </test-case>
+  <test-case name="EXPath-file-pathToUri-002">
+    <description>Use file:path-to-uri on a text file with spaces</description>
+    <created by="John Lumley" on="2015-01-13"/>
+    <environment ref="EXPath-file"/>
+    <test>
+      file:path-to-uri("sandpit/my file.txt")
+    </test>
+    <result>
+      <all-of>
+        <assert>ends-with($result, "sandpit/my%20file.txt")</assert>
+        <assert>starts-with($result, "file:/")</assert>
+      </all-of>
+    </result>
+  </test-case>
 
-  <test-case name="file-resolvePath-001">
+  <test-case name="EXPath-file-resolvePath-001">
     <description>Use file:resolve-path on a text file</description>
     <created by="Michael Kay" on="2012-06-11"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         file:resolve-path("sandpit/test.txt")
       </test>
@@ -2632,10 +2854,11 @@ This is a "merge".  But should a sub-dir be created or not?
     </result>
   </test-case>
 
-  <test-case name="file-dirSeparator-001">
+  <test-case name="EXPath-file-dirSeparator-001">
     <description>Use file:dir-separator</description>
     <created by="Michael Kay" on="2012-06-15"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         file:dir-separator()
       </test>
@@ -2647,10 +2870,11 @@ This is a "merge".  But should a sub-dir be created or not?
     </result>
   </test-case>
 
-  <test-case name="file-pathSeparator-001">
+  <test-case name="EXPath-file-pathSeparator-001">
     <description>Use file:path-separator</description>
     <created by="Michael Kay" on="2012-06-15"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         file:path-separator()
       </test>
@@ -2662,10 +2886,11 @@ This is a "merge".  But should a sub-dir be created or not?
     </result>
   </test-case>
 
-  <test-case name="file-lineSeparator-001">
+  <test-case name="EXPath-file-lineSeparator-001">
     <description>Use file:line-separator</description>
     <created by="Michael Kay" on="2012-06-15"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         string-to-codepoints(file:line-separator())
       </test>
@@ -2678,11 +2903,12 @@ This is a "merge".  But should a sub-dir be created or not?
     </result>
   </test-case>
 
-  <test-case name="file-lineSeparator-002">
+  <test-case name="EXPath-file-lineSeparator-002">
     <description>Consistency of file:line-separator, file:path-separator, and
       file:dir-separator</description>
     <created by="Michael Kay" on="2012-06-15"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         string-to-codepoints(file:path-separator() || file:dir-separator() || file:line-separator())
       </test>
@@ -2698,10 +2924,11 @@ This is a "merge".  But should a sub-dir be created or not?
     </result>
   </test-case>
   
-  <test-case name="file-tempDir-001">
+  <test-case name="EXPath-file-tempDir-001">
     <description>file:temp-dir return</description>
     <created by="John Lumley" on="2013-12-03"/>
-    <environment ref="file"/>
+    <modified by="John Lumley" on="2014-08-11" change="consistent EXPath naming"/>
+    <environment ref="EXPath-file"/>
     <test>
         file:temp-dir()
     </test>
